@@ -1,276 +1,204 @@
-// #include "stm32f1xx.h"
-// #include <stdlib.h>
-// #include <stdio.h>
-//
-// #define DATA_LENGTH_CODE 8
-//
-// class Clock {
-// public:
-//   inline Clock() {
-//     for (uint8_t i = 0;; i++) {
-//       if (RCC->CR & (1 << RCC_CR_HSIRDY_Pos))
-//         break;
-//       if (i == 255)
-//         return;
-//     }
-//     RCC->CFGR |= RCC_CFGR_PLLMULL9;
-//     RCC->CFGR |= RCC_CFGR_SW_1;
-//     RCC->CR |= RCC_CR_PLLON;
-//     for (uint8_t i = 0;; i++) {
-//       if (RCC->CR & (1U << RCC_CR_PLLRDY_Pos))
-//         break;
-//       if (i == 255) {
-//         RCC->CR &= ~(1U << RCC_CR_PLLON_Pos);
-//       }
-//     }
-//   }
-// };
-// class LED {
-// public:
-//   inline LED() {
-//     RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
-//
-//     GPIOC->CRH |= (GPIO_CRH_MODE13_0 | GPIO_CRH_MODE13_1);
-//     GPIOC->CRH &= ~(GPIO_CRH_CNF13_0 | GPIO_CRH_CNF13_1);
-//
-//     this->led_off();
-//   }
-//
-//   inline void led_on() { GPIOC->ODR &= ~(GPIO_ODR_ODR13); }
-//
-//   inline void led_off() { GPIOC->ODR |= GPIO_ODR_ODR13; }
-// };
-//
-// class CAN {
-// public:
-//   inline CAN() {
-//     RCC->APB1ENR |= RCC_APB1ENR_CAN1EN; /* turn on clocking for CAN */
-//     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN; /* turn on clocking for GPIOA */
-//     /* PA11 - CAN_RX */
-//     GPIOA->CRH &= ~GPIO_CRH_CNF11; /* CNF11 = 00 */
-//     GPIOA->CRH |=
-//         GPIO_CRH_CNF11_1; /* CNF11 = 10 -> AF Out | Push-pull (CAN_RX) */
-//     GPIOA->CRH |=
-//         GPIO_CRH_MODE11; /* MODE11 = 11 -> Maximum output speed 50 MHz */
-//     /* PA12 - CAN_TX */
-//     GPIOA->CRH &= ~GPIO_CRH_CNF12; /* CNF12 = 00 */
-//     GPIOA->CRH |=
-//         GPIO_CRH_CNF12_1; /* CNF12 = 10 -> AF Out | Push-pull (CAN_TX) */
-//     GPIOA->CRH |=
-//         GPIO_CRH_MODE12;       /* MODE12 = 11 -> Maximum output speed 50 MHz */
-//     CAN1->MCR |= CAN_MCR_INRQ; /* Initialization Request */
-//     CAN1->MCR |= CAN_MCR_NART; /* Not autoretranslate transmission */
-//     CAN1->MCR |= CAN_MCR_AWUM; /* Automatic Wakeup Mode */
-//     /* clean and set Prescaler = 9 */
-//     CAN1->BTR &= ~CAN_BTR_BRP;
-//     CAN1->BTR |= 8U << CAN_BTR_BRP_Pos;
-//     /* clean and set T_1s = 13, T_2s = 2 */
-//     CAN1->BTR &= ~CAN_BTR_TS1;
-//     CAN1->BTR |= 12U << CAN_BTR_TS1_Pos;
-//     CAN1->BTR &= ~CAN_BTR_TS2;
-//     CAN1->BTR |= 1U << CAN_BTR_TS2_Pos;
-//
-//     CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_RTR; /* data frame */
-//     CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_IDE; /* standart ID */
-//     CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_STID;
-//     CAN1->sTxMailBox[0].TIR |= (0x556U << CAN_TI0R_STID_Pos);
-//     CAN1->sTxMailBox[0].TDTR &= ~CAN_TDT0R_DLC; /* length of data in frame */
-//     CAN1->sTxMailBox[0].TDTR |= (DATA_LENGTH_CODE << CAN_TDT0R_DLC_Pos);
-//     CAN1->MCR &= ~CAN_MCR_INRQ;
-//   }
-//
-//   uint8_t send(uint8_t *pData, uint8_t dataLength) {
-//     uint16_t i = 0;
-//     uint8_t j = 0;
-//     while (!(CAN1->TSR & CAN_TSR_TME0)) {
-//       i++;
-//       if (i > 0xEFFF)
-//         return 1;
-//     }
-//     i = 0;
-//     CAN1->sTxMailBox[0].TDLR = 0;
-//     CAN1->sTxMailBox[0].TDHR = 0;
-//     while (i < dataLength) {
-//       if (i > (DATA_LENGTH_CODE - 1)) {
-//         CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ; /* Transmit Mailbox Request */
-//         dataLength -= i;
-//         j++;
-//         while (!(CAN1->TSR & CAN_TSR_TME0)) { /* Transmit mailbox 0 empty? */
-//           i++;
-//           if (i > 0xEFFF)
-//             return 1;
-//         }
-//         if (CAN1->TSR & CAN_TSR_TXOK0) {
-//           uint8_t is_ok = 1;
-//         } 
-//         i = 0;
-//         CAN1->sTxMailBox[0].TDLR = 0;
-//         CAN1->sTxMailBox[0].TDHR = 0;
-//       }
-//       if (i < 4)
-//         CAN1->sTxMailBox[0].TDLR |=
-//             (pData[i + j * DATA_LENGTH_CODE] * 1U << (i * 8));
-//       else
-//         CAN1->sTxMailBox[0].TDHR |=
-//             (pData[i + j * DATA_LENGTH_CODE] * 1U << (i * 8 - 32));
-//       i++;
-//     }
-//     CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ;
-//     if (CAN1->TSR & CAN_TSR_TXOK0) {
-//       return 0;
-//     } else {
-//       return ((CAN1->ESR & CAN_ESR_LEC) >> CAN_ESR_LEC_Pos);
-//     }
-//   }
-// };
-//
-// int main() {
-//   Clock clock;
-//
-//   LED led;
-//   led.led_on();
-//
-//   CAN can;
-//
-//   SystemCoreClockUpdate();
-//   __IO uint32_t clock_value = SystemCoreClock;
-//
-//   uint8_t temp = 0;
-//   uint8_t data[] = "hello_there";
-//
-//   volatile uint16_t counter = 0;
-//
-//   uint8_t error_code = can.send(data, sizeof(data));
-//   while (counter < 0xFFFF)
-//     counter++;
-//   counter = 0;
-//   while (1) {
-//   }
-//
-//   return 0;
-// }
+#include "stm32f1xx.h"
+#include <stdio.h>
+#include <stdlib.h>
 
-#include "main.h"
+#define CAN_ID_STD (0x00000000U)
+#define CAN_RTR_DATA (0x00000000U)
 
 #define DATA_LENGTH_CODE 8
 
-uint8_t rcc_init(void);
-uint8_t can_init(void);
-uint8_t can_send(uint8_t * pData, uint8_t dataLength);
-int main(void){
-    volatile uint16_t counter = 0;
-    uint8_t data[] = "ABCDEFGHIJ9";
-    rcc_init();
-    can_init();
-    while(1){
-        uint8_t error_code = can_send(data, sizeof(data));
-        while(counter<0xFFFF)
-            counter++;
-		    counter = 0;
-    }
-}
-
-uint8_t rcc_init(void){
-    /* Using the default HSI sorce - 8 MHz */
-    /* Checking that the HSI is working */
-    for (uint8_t i=0; ; i++){
-    if(RCC->CR & (1<<RCC_CR_HSIRDY_Pos))
+class Clock {
+public:
+  inline Clock() {
+    for (uint8_t i = 0;; i++) {
+      if (RCC->CR & (1 << RCC_CR_HSIRDY_Pos))
         break;
-    if(i == 255)
-        return 1;
+      if (i == 255)
+        return;
     }
-    /* RCC_CFGR Reset value: 0x0000 0000 */
-    /* PLLSRC: PLLSRC: PLL entry clock source - Reset Value - 0 -&gt; HSI oscillator clock / 2 selected as PLL input clock */
-    /* HSI = 8 MHz */
-    RCC->CFGR |= RCC_CFGR_PLLMULL9;     /* 0x000C0000 - PLL input clock*9 */
-    RCC->CFGR |= RCC_CFGR_SW_1;         /* 0x00000002 - PLL selected as system clock */
-    /* SYSCLK = 36 MHz */
-    /*Also you can change another parameters:*/
-    /* HPRE: AHB prescaler - Reset Value - 0 -> SYSCLK not divided */
-    /* HCLK = 36 MHz (72 MHz MAX) */
-    /* PPRE1: APB low-speed prescaler (APB1) - Reset Value - 0 ->; 0xx: HCLK not divided */
-    /* PPRE2: APB low-speed prescaler (APB2) - Reset Value - 0 ->; 0xx: HCLK not divided */
-    /* APB1 = APB2 = 36 MHz */
-    /* ADCPRE: ADC prescaler - Reset Value - 0 -&gt; PCLK2 divided by 2 */
-    /* PLLXTPRE: HSE divider for PLL entry - ResVal - 0 ->; HSE clock not divided */
-    /* USBPRE: USB prescaler - ResVal - 0: PLL clock is divided by 1.5 */
-    RCC->CR |=RCC_CR_PLLON;             /* 0x01000000 - PLL enable */
-    for (uint8_t i=0; ; i++){
-        if(RCC->CR & (1U<<RCC_CR_PLLRDY_Pos))
-            break;
-        if(i==255){
-            RCC->CR &= ~(1U<<RCC_CR_PLLON_Pos);
-            return 2;
-        }
-    }      
-    return 0;
-}
+    RCC->CFGR |= RCC_CFGR_PLLMULL9;
+    RCC->CFGR |= RCC_CFGR_SW_1;
+    RCC->CR |= RCC_CR_PLLON;
+    for (uint8_t i = 0;; i++) {
+      if (RCC->CR & (1U << RCC_CR_PLLRDY_Pos))
+        break;
+      if (i == 255) {
+        RCC->CR &= ~(1U << RCC_CR_PLLON_Pos);
+      }
+    }
+  }
+};
+class LED {
+public:
+  inline LED() {
+    RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
 
-uint8_t can_init(void){
-    RCC->APB1ENR |= RCC_APB1ENR_CAN1EN; /* turn on clocking for CAN */
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN; /* turn on clocking for GPIOA */
-    /* PA11 - CAN_RX */
-    GPIOA->CRH	&= ~GPIO_CRH_CNF11;     /* CNF11 = 00 */
-    GPIOA->CRH	|= GPIO_CRH_CNF11_1;	  /* CNF11 = 10 -> AF Out | Push-pull (CAN_RX) */
-    GPIOA->CRH 	|= GPIO_CRH_MODE11;     /* MODE11 = 11 -> Maximum output speed 50 MHz */
-    /* PA12 - CAN_TX */
-    GPIOA->CRH	&= ~GPIO_CRH_CNF12;	    /* CNF12 = 00 */
-    GPIOA->CRH	|= GPIO_CRH_CNF12_1;	  /* CNF12 = 10 -> AF Out | Push-pull (CAN_TX) */
-    GPIOA->CRH 	|= GPIO_CRH_MODE12;     /* MODE12 = 11 -> Maximum output speed 50 MHz */
-    CAN1->MCR |= CAN_MCR_INRQ;          /* Initialization Request */
-    CAN1->MCR |= CAN_MCR_NART;          /* Not autoretranslate transmission */
-    CAN1->MCR |= CAN_MCR_AWUM;          /* Automatic Wakeup Mode */
-    /* clean and set Prescaler = 9 */
-    CAN1->BTR &= ~CAN_BTR_BRP;          
-    CAN1->BTR |= 8U << CAN_BTR_BRP_Pos;
-    /* clean and set T_1s = 13, T_2s = 2 */
-    CAN1->BTR &= ~CAN_BTR_TS1;
-    CAN1->BTR |= 12U << CAN_BTR_TS1_Pos;
-    CAN1->BTR &= ~CAN_BTR_TS2;
-    CAN1->BTR |= 1U << CAN_BTR_TS2_Pos;
+    GPIOC->CRH |= (GPIO_CRH_MODE13_0 | GPIO_CRH_MODE13_1);
+    GPIOC->CRH &= ~(GPIO_CRH_CNF13_0 | GPIO_CRH_CNF13_1);
 
-    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_RTR;                    /* data frame */
-    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_IDE;                    /* standart ID */ 
+    this->led_off();
+  }
+
+  inline void led_on() { GPIOC->ODR &= ~(GPIO_ODR_ODR13); }
+
+  inline void led_off() { GPIOC->ODR |= GPIO_ODR_ODR13; }
+};
+
+typedef struct {
+  uint32_t StdId; /*!< Specifies the standard identifier.
+                       This parameter must be a number between Min_Data = 0 and
+                     Max_Data = 0x7FF. */
+
+  uint32_t ExtId; /*!< Specifies the extended identifier.
+                       This parameter must be a number between Min_Data = 0 and
+                     Max_Data = 0x1FFFFFFF. */
+
+  uint32_t IDE; /*!< Specifies the type of identifier for the message that will
+                   be transmitted. This parameter can be a value of @ref
+                   CAN_identifier_type */
+
+  uint32_t RTR; /*!< Specifies the type of frame for the message that will be
+                   transmitted. This parameter can be a value of @ref
+                   CAN_remote_transmission_request */
+
+  uint32_t DLC; /*!< Specifies the length of the frame that will be transmitted.
+                     This parameter must be a number between Min_Data = 0 and
+                   Max_Data = 8. */
+
+  uint32_t Timestamp; /*!< Specifies the timestamp counter value captured on
+                         start of frame reception.
+                          @note: Time Triggered Communication Mode must be
+                         enabled. This parameter must be a number between
+                         Min_Data = 0 and Max_Data = 0xFFFF. */
+
+  uint32_t FilterMatchIndex; /*!< Specifies the index of matching acceptance
+                          filter element. This parameter must be a number
+                          between Min_Data = 0 and Max_Data = 0xFF. */
+
+} CAN_RxHeaderTypeDef;
+
+typedef struct {
+  uint32_t StdId; /*!< Specifies the standard identifier.
+                       This parameter must be a number between Min_Data = 0 and
+                     Max_Data = 0x7FF. */
+
+  uint32_t ExtId; /*!< Specifies the extended identifier.
+                       This parameter must be a number between Min_Data = 0 and
+                     Max_Data = 0x1FFFFFFF. */
+
+  uint32_t IDE; /*!< Specifies the type of identifier for the message that will
+                   be transmitted. This parameter can be a value of @ref
+                   CAN_identifier_type */
+
+  uint32_t RTR; /*!< Specifies the type of frame for the message that will be
+                   transmitted. This parameter can be a value of @ref
+                   CAN_remote_transmission_request */
+
+  uint32_t DLC; /*!< Specifies the length of the frame that will be transmitted.
+                     This parameter must be a number between Min_Data = 0 and
+                   Max_Data = 8. */
+
+  FunctionalState
+      TransmitGlobalTime; /*!< Specifies whether the timestamp counter value
+              captured on start of frame transmission, is sent in DATA6 and
+              DATA7 replacing pData[6] and pData[7].
+              @note: Time Triggered Communication Mode must be enabled.
+              @note: DLC must be programmed as 8 bytes, in order these 2 bytes
+              are sent. This parameter can be set to ENABLE or DISABLE. */
+
+} CAN_TxHeaderTypeDef;
+
+class CAN {
+public:
+  inline CAN() {
+    RCC->APB1ENR |= RCC_APB1ENR_CAN1EN;
+    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
+
+    CAN_TxHeaderTypeDef header;
+
+    header.IDE = CAN_ID_STD;   // setting ID to Standard ID
+    header.StdId = 0x446;      // Identifier
+    header.RTR = CAN_RTR_DATA; // Setting Remote Transmission Request
+    header.DLC = 2;            // Data Length of Data bytes
+
+    // PA11 - CAN_RX
+    GPIOA->CRH &= ~(GPIO_CRH_CNF11_Msk);
+    // GPIOA->CRH |= GPIO_CRH_CNF11_1;
+    GPIOA->ODR |= GPIO_ODR_ODR11;
+    GPIOA->CRH |= GPIO_CRH_MODE11_1;
+
+    // PA12 - CAN_TX
+    GPIOA->CRH &= ~(GPIO_CRH_CNF12_Msk);
+    GPIOA->CRH |= GPIO_CRH_CNF12_1;
+    GPIOA->CRH |= GPIO_CRH_MODE12;
+
+    CAN1->MCR |= CAN_MCR_INRQ;
+
+    CAN1->MCR |= CAN_MCR_NART;
+    CAN1->MCR |= CAN_MCR_AWUM;
+
+    CAN1->BTR &= ~(CAN_BTR_BRP);
+
+    CAN1->BTR |= ((40 - 1) << CAN_BTR_BRP_Pos);
+
+    CAN1->BTR &= ~(CAN_BTR_TS1_Msk);
+    CAN1->BTR |= ((12 - 1) << CAN_BTR_TS1_Pos);
+
+    CAN1->BTR &= ~(CAN_BTR_TS2_Msk);
+    CAN1->BTR |= ((2 - 1) << CAN_BTR_TS2_Pos);
+
+    // may be u should use SJW settings
+    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_RTR;
+
+    // standart identifier
+    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_IDE;
+
     CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_STID;
-    CAN1->sTxMailBox[0].TIR |= (0x556U << CAN_TI0R_STID_Pos);
-    CAN1->sTxMailBox[0].TDTR &= ~CAN_TDT0R_DLC;                  /* length of data in frame */
-    CAN1->sTxMailBox[0].TDTR |= (DATA_LENGTH_CODE << CAN_TDT0R_DLC_Pos);
-    CAN1->MCR &= ~CAN_MCR_INRQ;                                  /* go to normal mode */ 
-    return 0;	
-}
+    CAN1->sTxMailBox[0].TIR |= (777 << CAN_TI0R_STID_Pos);
 
-uint8_t can_send(uint8_t * pData, uint8_t dataLength){
-    uint16_t i = 0;
-    uint8_t j = 0;
-    while (!(CAN1->TSR & CAN_TSR_TME0)){
-        i++;
-        if (i>0xEFFF) return 1;
+    // data length 8
+    CAN1->sTxMailBox[0].TDTR &= ~CAN_TDT0R_DLC;
+    CAN1->sTxMailBox[0].TDTR |= (8 << CAN_TDT0R_DLC_Pos);
+
+    CAN1->MCR &= ~CAN_MCR_INRQ;
+  }
+
+  uint8_t send(uint8_t *pData, uint8_t dataLength) {
+    while (!(CAN1->TSR & CAN_TSR_TME0)) {
     }
-    i = 0;
-    CAN1->sTxMailBox[0].TDLR = 0;
-    CAN1->sTxMailBox[0].TDHR = 0;
-    while (i<dataLength){
-        if (i>(DATA_LENGTH_CODE-1)){
-            CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ;                 /* Transmit Mailbox Request */
-            dataLength -= i;
-            j++;
-            while (!(CAN1->TSR & CAN_TSR_TME0)){                      /* Transmit mailbox 0 empty? */
-                i++;
-                if (i>0xEFFF) return 1;
-            }
-        if (CAN1->TSR & CAN_TSR_TXOK0){}                          /* Tx OK? */
-        //else return ((CAN1->ESR & CAN_ESR_LEC)>>CAN_ESR_LEC_Pos); / return Last error code /
-        i = 0;
-        CAN1->sTxMailBox[0].TDLR = 0;
-        CAN1->sTxMailBox[0].TDHR = 0;
-        }
-        if (i<4)
-	          CAN1->sTxMailBox[0].TDLR |= (pData[i+j*DATA_LENGTH_CODE]*1U << (i*8));
-        else
-	          CAN1->sTxMailBox[0].TDHR |= (pData[i+j*DATA_LENGTH_CODE]*1U << (i*8-32));
-        i++;
+
+    CAN1->sTxMailBox[0].TDLR = 1003;
+    CAN1->sTxMailBox[0].TDHR = 1101;
+
+    CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ;
+
+    while (!(CAN1->TSR & CAN_TSR_TME0)) {
     }
-    CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ; /* Transmit Mailbox Request */
-    if (CAN1->TSR & CAN_TSR_TXOK0) return 0;
-    else return ((CAN1->ESR & CAN_ESR_LEC)>>CAN_ESR_LEC_Pos); /* return Last error code */
+
+    uint8_t is_transmission_ok = CAN1->TSR & CAN_TSR_TXOK0;
+    printf("I am slizer");
+  }
+};
+
+int main() {
+  Clock clock;
+
+  LED led;
+  led.led_on();
+
+  SystemCoreClockUpdate();
+  __IO uint32_t clock_value = SystemCoreClock;
+
+  CAN can;
+
+  uint8_t temp = 0;
+  uint8_t data[] = "hello_there";
+
+  volatile uint16_t counter = 0;
+
+  while (1) {
+    uint8_t error_code = can.send(data, sizeof(data));
+  }
+
+  return 0;
 }
