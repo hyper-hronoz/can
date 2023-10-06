@@ -141,8 +141,9 @@ uint8_t can_send2(uint8_t * pData, uint8_t dataLength){
         i++;
     }
     CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ; /* Transmit Mailbox Request */
+    uint8_t error_code = ((CAN1->ESR & CAN_ESR_LEC)>>CAN_ESR_LEC_Pos);
     if (CAN1->TSR & CAN_TSR_TXOK0) return 0;
-    else return ((CAN1->ESR & CAN_ESR_LEC)>>CAN_ESR_LEC_Pos); /* return Last error code */
+    else return error_code; /* return Last error code */
 }
 
 class CAN {
@@ -188,31 +189,32 @@ public:
     CAN1->MCR |= CAN_MCR_AWUM;
 
     // disable silent mode
-    CAN1->BTR &= ~(CAN_BTR_SILM_Msk);
+    // CAN1->BTR &= ~(CAN_BTR_SILM_Msk);
     // disable loop back mode
-    CAN1->BTR &= ~(CAN_BTR_LBKM_Msk);
+    // CAN1->BTR &= ~(CAN_BTR_LBKM_Msk);
 
+    // disable silent mode
+    // CAN1->BTR |= CAN_BTR_SILM_Msk;
+    // disable loop back mode
+    CAN1->BTR |= CAN_BTR_LBKM;
 
     CAN1->BTR &= ~(CAN_BTR_BRP);
-    //
-    CAN1->BTR |= ((40 - 1) << CAN_BTR_BRP_Pos);
-    //
+    CAN1->BTR |= ((18 - 1) << CAN_BTR_BRP_Pos);
+
     CAN1->BTR &= ~(CAN_BTR_TS1_Msk);
-    CAN1->BTR |= ((12 - 1) << CAN_BTR_TS1_Pos);
-    //
+    CAN1->BTR |= ((13 - 1) << CAN_BTR_TS1_Pos);
+
     CAN1->BTR &= ~(CAN_BTR_TS2_Msk);
     CAN1->BTR |= ((2 - 1) << CAN_BTR_TS2_Pos);
-    //
-    // // may be u should use SJW settings
+
+    CAN1->BTR |= CAN_BTR_SJW_1;
+
     CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_RTR;
-    //
-    // // standart identifier
     CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_IDE;
-    //
+
     CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_STID;
     CAN1->sTxMailBox[0].TIR |= (777 << CAN_TI0R_STID_Pos);
 
-    // data length 8
     CAN1->sTxMailBox[0].TDTR &= ~CAN_TDT0R_DLC;
     CAN1->sTxMailBox[0].TDTR |= (8 << CAN_TDT0R_DLC_Pos);
 
@@ -224,8 +226,8 @@ public:
     while (!(CAN1->TSR & CAN_TSR_TME0)) {
     }
 
-    CAN1->sTxMailBox[0].TDLR = 1003;
-    CAN1->sTxMailBox[0].TDHR = 1101;
+    CAN1->sTxMailBox[0].TDLR = 'I';
+    CAN1->sTxMailBox[0].TDHR = 'I';
 
     CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ;
 
@@ -251,13 +253,14 @@ int main() {
   CAN can;
 
   uint8_t temp = 0;
-  uint8_t data[] = "fuck";
+  uint8_t data[] = "all aboard kiss by the iron fiest we are sainted by the storm";
 
   volatile uint16_t counter = 0;
 
+  // can.send(data, sizeof(data));
+  // can_send2(data, sizeof(data));
+  // can_send2(data, sizeof(data));
   can_send2(data, sizeof(data));
-  // can_send2(data, sizeof(data));
-  // can_send2(data, sizeof(data));
   while (1) {
     // can_send2(data, sizeof(data));
     // uint8_t error_code = can.send(data, sizeof(data));
