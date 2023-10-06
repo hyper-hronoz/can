@@ -29,6 +29,25 @@ public:
     }
   }
 };
+
+class Delay {
+public:
+  Delay() {
+    RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;
+    TIM4->PSC = 35;
+    TIM4->ARR = 999;
+    TIM4->CR1 |= TIM_CR1_CEN;
+  }
+
+  void wait(uint32_t ms) {
+    for (uint16_t i = 0; i < ms; i++) {
+      TIM4->SR &= ~(0b1 << 0);
+      while (!(TIM4->SR & (0b1 << 0))) {
+      }
+    }
+  }
+};
+
 class LED {
 public:
   inline LED() {
@@ -46,104 +65,80 @@ public:
 };
 
 typedef struct {
-  uint32_t StdId; /*!< Specifies the standard identifier.
-                       This parameter must be a number between Min_Data = 0 and
-                     Max_Data = 0x7FF. */
+  uint32_t StdId;
 
-  uint32_t ExtId; /*!< Specifies the extended identifier.
-                       This parameter must be a number between Min_Data = 0 and
-                     Max_Data = 0x1FFFFFFF. */
+  uint32_t ExtId;
 
-  uint32_t IDE; /*!< Specifies the type of identifier for the message that will
-                   be transmitted. This parameter can be a value of @ref
-                   CAN_identifier_type */
+  uint32_t IDE;
 
-  uint32_t RTR; /*!< Specifies the type of frame for the message that will be
-                   transmitted. This parameter can be a value of @ref
-                   CAN_remote_transmission_request */
+  uint32_t RTR;
 
-  uint32_t DLC; /*!< Specifies the length of the frame that will be transmitted.
-                     This parameter must be a number between Min_Data = 0 and
-                   Max_Data = 8. */
+  uint32_t DLC;
 
-  uint32_t Timestamp; /*!< Specifies the timestamp counter value captured on
-                         start of frame reception.
-                          @note: Time Triggered Communication Mode must be
-                         enabled. This parameter must be a number between
-                         Min_Data = 0 and Max_Data = 0xFFFF. */
+  uint32_t Timestamp;
 
-  uint32_t FilterMatchIndex; /*!< Specifies the index of matching acceptance
-                          filter element. This parameter must be a number
-                          between Min_Data = 0 and Max_Data = 0xFF. */
+  uint32_t FilterMatchIndex;
 
 } CAN_RxHeaderTypeDef;
 
 typedef struct {
-  uint32_t StdId; /*!< Specifies the standard identifier.
-                       This parameter must be a number between Min_Data = 0 and
-                     Max_Data = 0x7FF. */
+  uint32_t StdId;
 
-  uint32_t ExtId; /*!< Specifies the extended identifier.
-                       This parameter must be a number between Min_Data = 0 and
-                     Max_Data = 0x1FFFFFFF. */
+  uint32_t ExtId;
 
-  uint32_t IDE; /*!< Specifies the type of identifier for the message that will
-                   be transmitted. This parameter can be a value of @ref
-                   CAN_identifier_type */
+  uint32_t IDE;
 
-  uint32_t RTR; /*!< Specifies the type of frame for the message that will be
-                   transmitted. This parameter can be a value of @ref
-                   CAN_remote_transmission_request */
+  uint32_t RTR;
 
-  uint32_t DLC; /*!< Specifies the length of the frame that will be transmitted.
-                     This parameter must be a number between Min_Data = 0 and
-                   Max_Data = 8. */
+  uint32_t DLC;
 
-  FunctionalState
-      TransmitGlobalTime; /*!< Specifies whether the timestamp counter value
-              captured on start of frame transmission, is sent in DATA6 and
-              DATA7 replacing pData[6] and pData[7].
-              @note: Time Triggered Communication Mode must be enabled.
-              @note: DLC must be programmed as 8 bytes, in order these 2 bytes
-              are sent. This parameter can be set to ENABLE or DISABLE. */
+  FunctionalState TransmitGlobalTime;
 
 } CAN_TxHeaderTypeDef;
 
-uint8_t can_send2(uint8_t * pData, uint8_t dataLength){
-    uint16_t i = 0;
-    uint8_t j = 0;
-    while (!(CAN1->TSR & CAN_TSR_TME0)){
+uint8_t can_send2(uint8_t *pData, uint8_t dataLength) {
+  uint16_t i = 0;
+  uint8_t j = 0;
+  while (!(CAN1->TSR & CAN_TSR_TME0)) {
+    i++;
+    if (i > 0xEFFF)
+      return 1;
+  }
+  i = 0;
+  CAN1->sTxMailBox[0].TDLR = 0;
+  CAN1->sTxMailBox[0].TDHR = 0;
+  while (i < dataLength) {
+    if (i > (DATA_LENGTH_CODE - 1)) {
+      CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ; /* Transmit Mailbox Request */
+      dataLength -= i;
+      j++;
+      while (!(CAN1->TSR & CAN_TSR_TME0)) { /* Transmit mailbox 0 empty? */
         i++;
-        if (i>0xEFFF) return 1;
+        if (i > 0xEFFF)
+          return 1;
+      }
+      if (CAN1->TSR & CAN_TSR_TXOK0) {
+      } /* Tx OK? */
+      // else return ((CAN1->ESR & CAN_ESR_LEC)>>CAN_ESR_LEC_Pos); / return Last
+      // error code /
+      i = 0;
+      CAN1->sTxMailBox[0].TDLR = 0;
+      CAN1->sTxMailBox[0].TDHR = 0;
     }
-    i = 0;
-    CAN1->sTxMailBox[0].TDLR = 0;
-    CAN1->sTxMailBox[0].TDHR = 0;
-    while (i<dataLength){
-        if (i>(DATA_LENGTH_CODE-1)){
-            CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ;                 /* Transmit Mailbox Request */
-            dataLength -= i;
-            j++;
-            while (!(CAN1->TSR & CAN_TSR_TME0)){                      /* Transmit mailbox 0 empty? */
-                i++;
-                if (i>0xEFFF) return 1;
-            }
-        if (CAN1->TSR & CAN_TSR_TXOK0){}                          /* Tx OK? */
-        //else return ((CAN1->ESR & CAN_ESR_LEC)>>CAN_ESR_LEC_Pos); / return Last error code /
-        i = 0;
-        CAN1->sTxMailBox[0].TDLR = 0;
-        CAN1->sTxMailBox[0].TDHR = 0;
-        }
-        if (i<4)
-	          CAN1->sTxMailBox[0].TDLR |= (pData[i+j*DATA_LENGTH_CODE]*1U << (i*8));
-        else
-	          CAN1->sTxMailBox[0].TDHR |= (pData[i+j*DATA_LENGTH_CODE]*1U << (i*8-32));
-        i++;
-    }
-    CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ; /* Transmit Mailbox Request */
-    uint8_t error_code = ((CAN1->ESR & CAN_ESR_LEC)>>CAN_ESR_LEC_Pos);
-    if (CAN1->TSR & CAN_TSR_TXOK0) return 0;
-    else return error_code; /* return Last error code */
+    if (i < 4)
+      CAN1->sTxMailBox[0].TDLR |=
+          (pData[i + j * DATA_LENGTH_CODE] * 1U << (i * 8));
+    else
+      CAN1->sTxMailBox[0].TDHR |=
+          (pData[i + j * DATA_LENGTH_CODE] * 1U << (i * 8 - 32));
+    i++;
+  }
+  CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ; /* Transmit Mailbox Request */
+  uint8_t error_code = ((CAN1->ESR & CAN_ESR_LEC) >> CAN_ESR_LEC_Pos);
+  if (CAN1->TSR & CAN_TSR_TXOK0)
+    return 0;
+  else
+    return error_code; /* return Last error code */
 }
 
 class CAN {
@@ -163,22 +158,25 @@ public:
     header.DLC = 2;            // Data Length of Data bytes
 
     /* PA11 - CAN_RX */ // as laternate function
-    // GPIOA->CRH	&= ~GPIO_CRH_CNF11;   /* CNF11 = 00 */ 
-    // GPIOA->CRH	|= GPIO_CRH_CNF11_1;  /* CNF11 = 10 -> AF Out | Push-pull (CAN_RX) */
-    // GPIOA->CRH 	|= GPIO_CRH_MODE11;   /* MODE8 = 11 -> Maximum output speed 50 MHz */
+    // GPIOA->CRH	&= ~GPIO_CRH_CNF11;   /* CNF11 = 00 */
+    // GPIOA->CRH	|= GPIO_CRH_CNF11_1;  /* CNF11 = 10 -> AF Out |
+    // Push-pull (CAN_RX) */ GPIOA->CRH 	|= GPIO_CRH_MODE11;   /* MODE8 =
+    // 11 -> Maximum output speed 50 MHz */
 
-    GPIOA->CRH	&= ~GPIO_CRH_MODE11_Msk;
-    GPIOA->CRH	&= ~(GPIO_CRH_CNF11_Msk);  
-    GPIOA->CRH	|= GPIO_CRH_CNF11_1;  
+    GPIOA->CRH &= ~GPIO_CRH_MODE11_Msk;
+    GPIOA->CRH &= ~(GPIO_CRH_CNF11_Msk);
+    GPIOA->CRH |= GPIO_CRH_CNF11_1;
     // pull up
-    // GPIOA->ODR	|= GPIO_ODR_ODR11;  /* CNF11 = 10 -> AF Out | Push-pull (CAN_RX) */
-    // pull down
-    // GPIOA->ODR	&= ~(GPIO_ODR_ODR11);  /* CNF11 = 10 -> AF Out | Push-pull (CAN_RX) */
+    // GPIOA->ODR	|= GPIO_ODR_ODR11;  /* CNF11 = 10 -> AF Out | Push-pull
+    // (CAN_RX) */ pull down GPIOA->ODR	&= ~(GPIO_ODR_ODR11);  /* CNF11 = 10 ->
+    // AF Out | Push-pull (CAN_RX) */
 
     /* PA12 - CAN_TX */
-    GPIOA->CRH	&= ~GPIO_CRH_CNF12;	  /* CNF12 = 00 */
-    GPIOA->CRH	|= GPIO_CRH_CNF12_1;	/* CNF12 = 10 -> AF Out | Push-pull (CAN_TX) */
-    GPIOA->CRH 	|= GPIO_CRH_MODE12;   /* MODE8 = 11 -> Maximum output speed 50 MHz */
+    GPIOA->CRH &= ~GPIO_CRH_CNF12; /* CNF12 = 00 */
+    GPIOA->CRH |=
+        GPIO_CRH_CNF12_1; /* CNF12 = 10 -> AF Out | Push-pull (CAN_TX) */
+    GPIOA->CRH |=
+        GPIO_CRH_MODE12; /* MODE8 = 11 -> Maximum output speed 50 MHz */
 
     CAN1->MCR |= CAN_MCR_INRQ;
 
@@ -232,7 +230,7 @@ public:
     CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ;
 
     // waiting until request for mailbox 1 complited
-    while(!(CAN1->MSR & (0b1 << 0))) {
+    while (!(CAN1->MSR & (0b1 << 0))) {
     };
 
     uint8_t is_transmission_ok = CAN1->TSR & CAN_TSR_TXOK0;
@@ -253,15 +251,16 @@ int main() {
   CAN can;
 
   uint8_t temp = 0;
-  uint8_t data[] = "all aboard kiss by the iron fiest we are sainted by the storm";
+  uint8_t data[] =
+      "all aboard kiss by the iron fiest we are sainted by the storm";
 
   volatile uint16_t counter = 0;
 
   // can.send(data, sizeof(data));
   // can_send2(data, sizeof(data));
   // can_send2(data, sizeof(data));
-  can_send2(data, sizeof(data));
   while (1) {
+    can_send2(data, sizeof(data));
     // can_send2(data, sizeof(data));
     // uint8_t error_code = can.send(data, sizeof(data));
   }

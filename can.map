@@ -1724,12 +1724,12 @@ LOAD /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a
  .debug_rnglists
                 0x0000000000000154       0x19 CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
 
-.debug_line     0x0000000000000000      0xd28
- .debug_line    0x0000000000000000      0x505 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
- .debug_line    0x0000000000000505      0x15c CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
- .debug_line    0x0000000000000661      0x1c3 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
- .debug_line    0x0000000000000824      0x48c CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
- .debug_line    0x0000000000000cb0       0x78 CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
+.debug_line     0x0000000000000000      0xd25
+ .debug_line    0x0000000000000000      0x502 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+ .debug_line    0x0000000000000502      0x15c CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+ .debug_line    0x000000000000065e      0x1c3 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
+ .debug_line    0x0000000000000821      0x48c CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
+ .debug_line    0x0000000000000cad       0x78 CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
 
 .debug_str      0x0000000000000000      0xda0
  .debug_str     0x0000000000000000      0x515 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
