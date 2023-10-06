@@ -192,47 +192,31 @@ public:
     // disable loop back mode
     CAN1->BTR &= ~(CAN_BTR_LBKM_Msk);
 
-    /* clean and set Prescaler = 9 */
-    CAN1->BTR &= ~CAN_BTR_BRP;
-    CAN1->BTR |= 8U << CAN_BTR_BRP_Pos;
-    /* clean and set T_1s = 13, T_2s = 2 */
-    CAN1->BTR &= ~CAN_BTR_TS1;
-    CAN1->BTR |= 12U << CAN_BTR_TS1_Pos;
-    CAN1->BTR &= ~CAN_BTR_TS2;
-    CAN1->BTR |= 1U << CAN_BTR_TS2_Pos;
 
-    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_RTR; /* data frame */
-    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_IDE; /* standart ID */
-    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_STID;
-    CAN1->sTxMailBox[0].TIR |= (0x556U << CAN_TI0R_STID_Pos);
-    CAN1->sTxMailBox[0].TDTR &= ~CAN_TDT0R_DLC; /* length of data in frame */
-    CAN1->sTxMailBox[0].TDTR |= (2 << CAN_TDT0R_DLC_Pos);
-    CAN1->MCR &= ~CAN_MCR_INRQ;
-
-    // CAN1->BTR &= ~(CAN_BTR_BRP);
+    CAN1->BTR &= ~(CAN_BTR_BRP);
     //
-    // CAN1->BTR |= ((40 - 1) << CAN_BTR_BRP_Pos);
+    CAN1->BTR |= ((40 - 1) << CAN_BTR_BRP_Pos);
     //
-    // CAN1->BTR &= ~(CAN_BTR_TS1_Msk);
-    // CAN1->BTR |= ((12 - 1) << CAN_BTR_TS1_Pos);
+    CAN1->BTR &= ~(CAN_BTR_TS1_Msk);
+    CAN1->BTR |= ((12 - 1) << CAN_BTR_TS1_Pos);
     //
-    // CAN1->BTR &= ~(CAN_BTR_TS2_Msk);
-    // CAN1->BTR |= ((2 - 1) << CAN_BTR_TS2_Pos);
+    CAN1->BTR &= ~(CAN_BTR_TS2_Msk);
+    CAN1->BTR |= ((2 - 1) << CAN_BTR_TS2_Pos);
     //
     // // may be u should use SJW settings
-    // CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_RTR;
+    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_RTR;
     //
     // // standart identifier
-    // CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_IDE;
+    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_IDE;
     //
-    // CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_STID;
-    // CAN1->sTxMailBox[0].TIR |= (777 << CAN_TI0R_STID_Pos);
+    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_STID;
+    CAN1->sTxMailBox[0].TIR |= (777 << CAN_TI0R_STID_Pos);
 
     // data length 8
-    // CAN1->sTxMailBox[0].TDTR &= ~CAN_TDT0R_DLC;
-    // CAN1->sTxMailBox[0].TDTR |= (8 << CAN_TDT0R_DLC_Pos);
-    //
-    // CAN1->MCR &= ~CAN_MCR_INRQ;
+    CAN1->sTxMailBox[0].TDTR &= ~CAN_TDT0R_DLC;
+    CAN1->sTxMailBox[0].TDTR |= (8 << CAN_TDT0R_DLC_Pos);
+
+    CAN1->MCR &= ~CAN_MCR_INRQ;
   }
 
   uint8_t send(uint8_t *pData, uint8_t dataLength) {
@@ -267,7 +251,7 @@ int main() {
   CAN can;
 
   uint8_t temp = 0;
-  uint8_t data[] = "hello_there";
+  uint8_t data[] = "fuck";
 
   volatile uint16_t counter = 0;
 
