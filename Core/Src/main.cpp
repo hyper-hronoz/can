@@ -153,7 +153,14 @@ private:
   }
 
   void configure_recieving() {
+    CAN1->sFIFOMailBox[0].RIR &= ~(CAN_RI1R_IDE);
+    CAN1->sFIFOMailBox[0].RIR &= ~(CAN_RTR_DATA);
 
+    CAN1->sFIFOMailBox[0].RDTR &= ~(CAN_RDT0R_FMI_Msk);
+    CAN1->sFIFOMailBox[0].RDTR |= (0 << CAN_RDT0R_FMI_Pos);
+
+    CAN1->sFIFOMailBox[0].RDTR &= ~(CAN_RDT0R_DLC_Msk);
+    CAN1->sFIFOMailBox[0].RDTR |= (8 << CAN_RDT0R_DLC_Pos);
   }
 
   void configure_can_filter() {
