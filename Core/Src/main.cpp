@@ -1,3 +1,4 @@
+#include "stm32f103xb.h"
 #include "stm32f1xx.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -96,87 +97,87 @@ typedef struct {
 
 } CAN_TxHeaderTypeDef;
 
-uint8_t can_send2(uint8_t *pData, uint8_t dataLength) {
-  uint16_t i = 0;
-  uint8_t j = 0;
-  while (!(CAN1->TSR & CAN_TSR_TME0)) {
-    i++;
-    if (i > 0xEFFF)
-      return 1;
-  }
-  i = 0;
-  CAN1->sTxMailBox[0].TDLR = 0;
-  CAN1->sTxMailBox[0].TDHR = 0;
-  while (i < dataLength) {
-    if (i > (DATA_LENGTH_CODE - 1)) {
-      CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ; /* Transmit Mailbox Request */
-      dataLength -= i;
-      j++;
-      while (!(CAN1->TSR & CAN_TSR_TME0)) { /* Transmit mailbox 0 empty? */
-        i++;
-        if (i > 0xEFFF)
-          return 1;
-      }
-      if (CAN1->TSR & CAN_TSR_TXOK0) {
-      } /* Tx OK? */
-      // else return ((CAN1->ESR & CAN_ESR_LEC)>>CAN_ESR_LEC_Pos); / return Last
-      // error code /
-      i = 0;
-      CAN1->sTxMailBox[0].TDLR = 0;
-      CAN1->sTxMailBox[0].TDHR = 0;
-    }
-    if (i < 4)
-      CAN1->sTxMailBox[0].TDLR |=
-          (pData[i + j * DATA_LENGTH_CODE] * 1U << (i * 8));
-    else
-      CAN1->sTxMailBox[0].TDHR |=
-          (pData[i + j * DATA_LENGTH_CODE] * 1U << (i * 8 - 32));
-    i++;
-  }
-  CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ; /* Transmit Mailbox Request */
-  uint8_t error_code = ((CAN1->ESR & CAN_ESR_LEC) >> CAN_ESR_LEC_Pos);
-  if (CAN1->TSR & CAN_TSR_TXOK0)
-    return 0;
-  else
-    return error_code; /* return Last error code */
-}
+typedef struct {
+  uint8_t prescaler;
+  uint8_t time_segment_1;
+  uint8_t time_segment_2;
+  uint32_t SJW;
+  uint32_t loop_back;
+  uint16_t tx_ID;
+  uint16_t rx_ID;
+} CAN_INRQ;
 
 class CAN {
-public:
-  inline CAN() {
-    RCC->APB2ENR = 0;
-    RCC->APB1ENR = 0;
-
-    RCC->APB1ENR |= RCC_APB1ENR_CAN1EN;
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
-
-    CAN_TxHeaderTypeDef header;
-
-    header.IDE = CAN_ID_STD;   // setting ID to Standard ID
-    header.StdId = 0x446;      // Identifier
-    header.RTR = CAN_RTR_DATA; // Setting Remote Transmission Request
-    header.DLC = 2;            // Data Length of Data bytes
-
-    /* PA11 - CAN_RX */ // as laternate function
-    // GPIOA->CRH	&= ~GPIO_CRH_CNF11;   /* CNF11 = 00 */
-    // GPIOA->CRH	|= GPIO_CRH_CNF11_1;  /* CNF11 = 10 -> AF Out |
-    // Push-pull (CAN_RX) */ GPIOA->CRH 	|= GPIO_CRH_MODE11;   /* MODE8 =
-    // 11 -> Maximum output speed 50 MHz */
-
-    GPIOA->CRH &= ~GPIO_CRH_MODE11_Msk;
-    GPIOA->CRH &= ~(GPIO_CRH_CNF11_Msk);
+private:
+  void configure_can_gpio_rx() {
+    GPIOA->CRH &= ~GPIO_CRH_CNF11;
     GPIOA->CRH |= GPIO_CRH_CNF11_1;
-    // pull up
-    // GPIOA->ODR	|= GPIO_ODR_ODR11;  /* CNF11 = 10 -> AF Out | Push-pull
-    // (CAN_RX) */ pull down GPIOA->ODR	&= ~(GPIO_ODR_ODR11);  /* CNF11 = 10 ->
-    // AF Out | Push-pull (CAN_RX) */
+    GPIOA->CRH |= GPIO_CRH_MODE11;
+  }
 
-    /* PA12 - CAN_TX */
-    GPIOA->CRH &= ~GPIO_CRH_CNF12; /* CNF12 = 00 */
-    GPIOA->CRH |=
-        GPIO_CRH_CNF12_1; /* CNF12 = 10 -> AF Out | Push-pull (CAN_TX) */
-    GPIOA->CRH |=
-        GPIO_CRH_MODE12; /* MODE8 = 11 -> Maximum output speed 50 MHz */
+  void configure_can_gpio_tx() {
+    GPIOA->CRH &= ~GPIO_CRH_CNF12;
+    GPIOA->CRH |= GPIO_CRH_CNF12_1;
+    GPIOA->CRH |= GPIO_CRH_MODE12;
+  }
+
+  void configure_can_gpio() {
+    this->configure_can_gpio_tx();
+    this->configure_can_gpio_rx();
+  }
+
+  void configure_can_timings(CAN_INRQ header) {
+    CAN1->BTR |= (header.loop_back << CAN_BTR_LBKM_Pos);
+
+    CAN1->BTR &= ~(CAN_BTR_BRP);
+    CAN1->BTR |= ((header.prescaler - 1) << CAN_BTR_BRP_Pos);
+
+    CAN1->BTR &= ~(CAN_BTR_TS1_Msk);
+    CAN1->BTR |= ((header.time_segment_1 - 1) << CAN_BTR_TS1_Pos);
+
+    CAN1->BTR &= ~(CAN_BTR_TS2_Msk);
+    CAN1->BTR |= ((header.time_segment_2 - 1) << CAN_BTR_TS2_Pos);
+
+    CAN1->BTR |= (header.SJW << CAN_BTR_SJW_Pos);
+  }
+
+  void configure_can_tx_mailboxes(CAN_INRQ header) {
+    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_RTR;
+    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_IDE;
+
+    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_STID;
+    CAN1->sTxMailBox[0].TIR |= (header.tx_ID << CAN_TI0R_STID_Pos);
+
+    CAN1->sTxMailBox[0].TDTR &= ~CAN_TDT0R_DLC;
+    CAN1->sTxMailBox[0].TDTR |= (8 << CAN_TDT0R_DLC_Pos);
+  }
+
+  void configure_recieving() {
+
+  }
+
+  void configure_can_filter() {
+    CAN1->FMR |= CAN_FMR_FINIT;
+
+    // list mode strict filtering
+    CAN1->FM1R |= CAN_FM1R_FBM0;
+
+    // filter scale singl 32 bit
+    CAN1->FS1R |= CAN_FS1R_FSC0;
+
+    // filter 0 id 2
+    CAN1->sFilterRegister[0].FR1 = 2;
+
+    // filter 0 to fifo0
+    CAN1->FFA1R &= ~(CAN_FFA1R_FFA0);
+
+    // activate filter 0
+    CAN1->FA1R |= CAN_FA1R_FACT0;
+
+    CAN1->FMR &= ~(CAN_FMR_FINIT);
+  }
+
+  void can_INRQ(CAN_INRQ header) {
 
     CAN1->MCR |= CAN_MCR_INRQ;
 
@@ -186,57 +187,66 @@ public:
     CAN1->MCR |= CAN_MCR_NART;
     CAN1->MCR |= CAN_MCR_AWUM;
 
-    // disable silent mode
-    // CAN1->BTR &= ~(CAN_BTR_SILM_Msk);
-    // disable loop back mode
-    // CAN1->BTR &= ~(CAN_BTR_LBKM_Msk);
-
-    // disable silent mode
-    // CAN1->BTR |= CAN_BTR_SILM_Msk;
-    // disable loop back mode
-    CAN1->BTR |= CAN_BTR_LBKM;
-
-    CAN1->BTR &= ~(CAN_BTR_BRP);
-    CAN1->BTR |= ((18 - 1) << CAN_BTR_BRP_Pos);
-
-    CAN1->BTR &= ~(CAN_BTR_TS1_Msk);
-    CAN1->BTR |= ((13 - 1) << CAN_BTR_TS1_Pos);
-
-    CAN1->BTR &= ~(CAN_BTR_TS2_Msk);
-    CAN1->BTR |= ((2 - 1) << CAN_BTR_TS2_Pos);
-
-    CAN1->BTR |= CAN_BTR_SJW_1;
-
-    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_RTR;
-    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_IDE;
-
-    CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_STID;
-    CAN1->sTxMailBox[0].TIR |= (777 << CAN_TI0R_STID_Pos);
-
-    CAN1->sTxMailBox[0].TDTR &= ~CAN_TDT0R_DLC;
-    CAN1->sTxMailBox[0].TDTR |= (8 << CAN_TDT0R_DLC_Pos);
+    this->configure_can_timings(header);
+    this->configure_can_tx_mailboxes(header);
+    this->configure_can_filter();
 
     CAN1->MCR &= ~CAN_MCR_INRQ;
   }
 
-  uint8_t send(uint8_t *pData, uint8_t dataLength) {
-    // waiting until it get empty
-    while (!(CAN1->TSR & CAN_TSR_TME0)) {
-    }
+public:
+  inline CAN(CAN_INRQ header) {
+    RCC->APB1ENR |= RCC_APB1ENR_CAN1EN;
+    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 
-    CAN1->sTxMailBox[0].TDLR = 'I';
-    CAN1->sTxMailBox[0].TDHR = 'I';
-
-    CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ;
-
-    // waiting until request for mailbox 1 complited
-    while (!(CAN1->MSR & (0b1 << 0))) {
-    };
-
-    uint8_t is_transmission_ok = CAN1->TSR & CAN_TSR_TXOK0;
-    uint8_t error = (CAN1->ESR & CAN_ESR_LEC) >> CAN_ESR_LEC_Pos;
-    printf("I am slizer");
+    this->configure_can_gpio();
+    this->can_INRQ(header);
   }
+
+  uint8_t transmit(uint8_t *pData, uint8_t dataLength) {
+    uint16_t i = 0;
+    uint8_t j = 0;
+    while (!(CAN1->TSR & CAN_TSR_TME0)) {
+      i++;
+      if (i > 0xEFFF)
+        return 1;
+    }
+    i = 0;
+    CAN1->sTxMailBox[0].TDLR = 0;
+    CAN1->sTxMailBox[0].TDHR = 0;
+    while (i < dataLength) {
+      if (i > (DATA_LENGTH_CODE - 1)) {
+        CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ;
+        dataLength -= i;
+        j++;
+        while (!(CAN1->TSR & CAN_TSR_TME0)) {
+          i++;
+          if (i > 0xEFFF)
+            return 1;
+        }
+        if (CAN1->TSR & CAN_TSR_TXOK0) {
+        }
+        i = 0;
+        CAN1->sTxMailBox[0].TDLR = 0;
+        CAN1->sTxMailBox[0].TDHR = 0;
+      }
+      if (i < 4)
+        CAN1->sTxMailBox[0].TDLR |=
+            (pData[i + j * DATA_LENGTH_CODE] * 1U << (i * 8));
+      else
+        CAN1->sTxMailBox[0].TDHR |=
+            (pData[i + j * DATA_LENGTH_CODE] * 1U << (i * 8 - 32));
+      i++;
+    }
+    CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ;
+    uint8_t error_code = ((CAN1->ESR & CAN_ESR_LEC) >> CAN_ESR_LEC_Pos);
+    if (CAN1->TSR & CAN_TSR_TXOK0)
+      return 0;
+    else
+      return error_code;
+  }
+
+  uint8_t recieve() {}
 };
 
 int main() {
@@ -248,7 +258,15 @@ int main() {
   SystemCoreClockUpdate();
   __IO uint32_t clock_value = SystemCoreClock;
 
-  CAN can;
+  CAN_INRQ inrq_config;
+  inrq_config.prescaler = 18;
+  inrq_config.time_segment_1 = 13;
+  inrq_config.time_segment_2 = 2;
+  inrq_config.SJW = 1;
+  inrq_config.loop_back = 1;
+  inrq_config.tx_ID = 2;
+
+  CAN can(inrq_config);
 
   uint8_t temp = 0;
   uint8_t data[] =
@@ -256,13 +274,11 @@ int main() {
 
   volatile uint16_t counter = 0;
 
-  // can.send(data, sizeof(data));
-  // can_send2(data, sizeof(data));
-  // can_send2(data, sizeof(data));
+  // 125	0.0000	18	16	13	2	87.5	 0x001c0011
+
   while (1) {
-    can_send2(data, sizeof(data));
-    // can_send2(data, sizeof(data));
-    // uint8_t error_code = can.send(data, sizeof(data));
+    can.transmit(data, sizeof(data));
+    Delay().wait(1000);
   }
 
   return 0;
