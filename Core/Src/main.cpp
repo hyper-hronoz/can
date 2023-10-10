@@ -105,6 +105,7 @@ typedef struct {
   uint32_t loop_back;
   uint16_t tx_ID;
   uint16_t rx_ID;
+  uint8_t silent_mode;
 } CAN_INRQ;
 
 class CAN {
@@ -127,7 +128,11 @@ private:
   }
 
   void configure_can_timings(CAN_INRQ header) {
+    CAN1->BTR &= ~(CAN_BTR_LBKM_Msk);
     CAN1->BTR |= (header.loop_back << CAN_BTR_LBKM_Pos);
+
+    CAN1->BTR &= ~(CAN_BTR_SILM_Msk);
+    CAN1->BTR |= (header.silent_mode << CAN_BTR_SILM_Pos);
 
     CAN1->BTR &= ~(CAN_BTR_BRP);
     CAN1->BTR |= ((header.prescaler - 1) << CAN_BTR_BRP_Pos);
@@ -153,40 +158,76 @@ private:
   }
 
   void configure_recieving() {
+    // standart identifier
     CAN1->sFIFOMailBox[0].RIR &= ~(CAN_RI1R_IDE);
-    CAN1->sFIFOMailBox[0].RIR &= ~(CAN_RTR_DATA);
+    // CAN1->sFIFOMailBox[0].RIR |= CAN_RI1R_IDE;
 
+    // remote transmission request
+    CAN1->sFIFOMailBox[0].RIR &= ~(CAN_RTR_DATA); // data frame
+
+    // configuring filter for mailbox ex: 0 - index of filter
     CAN1->sFIFOMailBox[0].RDTR &= ~(CAN_RDT0R_FMI_Msk);
     CAN1->sFIFOMailBox[0].RDTR |= (0 << CAN_RDT0R_FMI_Pos);
 
+    // configure data length in bytes
     CAN1->sFIFOMailBox[0].RDTR &= ~(CAN_RDT0R_DLC_Msk);
     CAN1->sFIFOMailBox[0].RDTR |= (8 << CAN_RDT0R_DLC_Pos);
   }
+
+  void filter_to_mask() { CAN1->FM1R &= ~(CAN_FM1R_FBM0); }
+
+  void filter_to_list() {
+    CAN1->FM1R &= ~(CAN_FM1R_FBM0);
+    CAN1->FM1R |= CAN_FM1R_FBM0;
+  }
+
+  void filter_to_fifo0() { CAN1->FFA1R &= ~(CAN_FFA1R_FFA0); }
+
+  void filter_to_fifo1() {
+    CAN1->FFA1R &= ~(CAN_FFA1R_FFA0);
+    CAN1->FFA1R |= CAN_FFA1R_FFA0;
+  }
+
+  void filter_to_32bit_scale() {
+    CAN1->FS1R &= ~(CAN_FS1R_FSC0);
+    CAN1->FS1R |= CAN_FS1R_FSC0;
+  }
+
+  void filter_to_two_16bit_scale() { CAN1->FS1R &= ~(CAN_FS1R_FSC0); }
 
   void configure_can_filter() {
     CAN1->FMR |= CAN_FMR_FINIT;
 
     // list mode strict filtering
-    CAN1->FM1R |= CAN_FM1R_FBM0;
+    this->filter_to_mask();
 
-    // filter scale singl 32 bit
-    CAN1->FS1R |= CAN_FS1R_FSC0;
+    this->filter_to_32bit_scale();
 
     // filter 0 id 2
-    CAN1->sFilterRegister[0].FR1 = 2;
+    CAN1->sFilterRegister[0].FR1 = 0;
+    CAN1->sFilterRegister[0].FR2 = 0;
 
-    // filter 0 to fifo0
-    CAN1->FFA1R &= ~(CAN_FFA1R_FFA0);
+    this->filter_to_fifo0();
+
+    CAN1->FMR &= ~(CAN_FMR_FINIT);
 
     // activate filter 0
     CAN1->FA1R |= CAN_FA1R_FACT0;
 
-    CAN1->FMR &= ~(CAN_FMR_FINIT);
+    CAN1->IER |= CAN_IER_FMPIE0;
+    // CAN1->IER |= CAN_IER_FFIE0;
+    NVIC_EnableIRQ(CAN1_RX0_IRQn);
   }
 
   void can_INRQ(CAN_INRQ header) {
 
     CAN1->MCR |= CAN_MCR_INRQ;
+
+    CAN1->IER |= CAN_IER_WKUIE;
+    CAN1->IER |= CAN_IER_TMEIE;
+    NVIC_EnableIRQ(CAN1_TX_IRQn);
+
+
 
     while (!(CAN1->MSR & CAN_MSR_INAK)) {
     };
@@ -197,6 +238,7 @@ private:
     this->configure_can_timings(header);
     this->configure_can_tx_mailboxes(header);
     this->configure_can_filter();
+    this->configure_recieving();
 
     CAN1->MCR &= ~CAN_MCR_INRQ;
   }
@@ -253,8 +295,28 @@ public:
       return error_code;
   }
 
-  uint8_t recieve() {}
+  uint8_t recieve() {
+    uint32_t revieved_data_hight = CAN1->sFIFOMailBox[0].RDHR;
+    uint32_t revieved_data_low = CAN1->sFIFOMailBox[0].RDHR;
+    while (!(CAN1->RF0R & CAN_RF0R_FOVR0)) {
+    }
+    revieved_data_hight = CAN1->sFIFOMailBox[0].RDHR;
+    revieved_data_low = CAN1->sFIFOMailBox[0].RDHR;
+    // printf("noth");
+    LED().led_off();
+  }
 };
+
+
+void CAN1_TX_IRQHandler(void) {
+  LED().led_off();
+}
+
+void CAN1_RX0_IRQHandler(void) {
+  uint8_t data = CAN1->sFIFOMailBox[0].RDLR;
+  CAN1->RF0R |= CAN_RF0R_RFOM0;
+  LED().led_off();
+}
 
 int main() {
   Clock clock;
@@ -271,20 +333,21 @@ int main() {
   inrq_config.time_segment_2 = 2;
   inrq_config.SJW = 1;
   inrq_config.loop_back = 1;
-  inrq_config.tx_ID = 2;
+  inrq_config.silent_mode = 0;
+  inrq_config.tx_ID = 0;
 
   CAN can(inrq_config);
 
   uint8_t temp = 0;
-  uint8_t data[] =
-      "all aboard kiss by the iron fiest we are sainted by the storm";
-
-  volatile uint16_t counter = 0;
+  uint8_t data[] = "fucker";
 
   // 125	0.0000	18	16	13	2	87.5	 0x001c0011
 
+  uint32_t counter = 0;
   while (1) {
-    can.transmit(data, sizeof(data));
+    uint8_t temp = data[counter % 5];
+    can.transmit(&temp, sizeof(temp));
+    counter++;
     Delay().wait(1000);
   }
 
