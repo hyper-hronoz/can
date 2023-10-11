@@ -35,9 +35,8 @@ public:
 
 class Delay {
 public:
-  Delay() {
-  }
-  
+  Delay() {}
+
   inline void __init__() {
     RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;
     TIM4->PSC = 35;
@@ -56,8 +55,7 @@ public:
 
 class LED {
 public:
-  inline LED() {
-  }
+  inline LED() {}
 
   inline void __init__() {
     RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
@@ -71,6 +69,8 @@ public:
   inline void led_on() { GPIOC->ODR &= ~(GPIO_ODR_ODR13); }
 
   inline void led_off() { GPIOC->ODR |= GPIO_ODR_ODR13; }
+
+  inline void led_toggle() { GPIOC->ODR ^= GPIO_ODR_ODR13; }
 };
 
 typedef struct {
@@ -206,7 +206,7 @@ private:
     CAN1->FMR |= CAN_FMR_FINIT;
 
     // list mode strict filtering
-    this->filter_to_mask();
+    this->filter_to_list();
 
     this->filter_to_32bit_scale();
 
@@ -248,8 +248,8 @@ private:
 
     this->configure_can_timings(header);
     this->configure_can_tx_mailboxes(header);
-    this->configure_can_filter();
     this->configure_recieving();
+    this->configure_can_filter();
 
     CAN1->MCR &= ~CAN_MCR_INRQ;
   }
@@ -309,11 +309,20 @@ public:
   }
 
   void recieve() {
-    uint32_t revieved_data_hight = CAN1->sFIFOMailBox[0].RDHR;
-    uint32_t revieved_data_low = CAN1->sFIFOMailBox[0].RDHR;
-    int32_t messages_amount = CAN1->RF0R << CAN_RF0R_FMP0_Pos;
-    while (messages_amount != 0) {
+    uint32_t recieved_data_hight = CAN1->sFIFOMailBox[0].RDHR;
+    uint32_t recieved_data_low = CAN1->sFIFOMailBox[0].RDLR;
+    uint8_t messages_amount = CAN1->RF0R << CAN_RF0R_FMP0_Pos;
+
+    uint8_t data[8] = {};
+    for (uint8_t i = 0; i < 8; i++) {
+      if (i < 4) {
+        uint8_t f = recieved_data_low >> (i * 8);
+        data[i] = recieved_data_low >> (i * 8);
+      } else {
+        data[i] = recieved_data_hight >> (i * 8 - 32);
+      }
     }
+    CAN1->RF0R |= CAN_RF0R_RFOM0;
     messages_amount = CAN1->RF0R << CAN_RF0R_FMP0_Pos;
     // printf("noth");
     LED().led_off();
@@ -321,8 +330,7 @@ public:
 };
 
 extern "C" void CAN1_RX0_IRQHandler(void) {
-  uint8_t data = CAN1->sFIFOMailBox[0].RDLR;
-  CAN1->RF0R |= CAN_RF0R_RFOM0;
+  CAN().recieve();
   LED().led_off();
 }
 
@@ -342,11 +350,11 @@ int main() {
   led.__init__();
   led.led_on();
 
-
   SystemCoreClockUpdate();
   __IO uint32_t clock_value = SystemCoreClock;
 
   CAN_INRQ inrq_config;
+
   inrq_config.prescaler = 18;
   inrq_config.time_segment_1 = 13;
   inrq_config.time_segment_2 = 2;
@@ -360,7 +368,7 @@ int main() {
 
   uint8_t temp = 0;
   uint8_t data[] =
-      "mother fucker kiss by the iron fiest we are sainted by the storm";
+      "iother fucker kiss by the iron fiest we are sainted by the storm";
 
   volatile uint16_t counter = 0;
 
