@@ -10,7 +10,9 @@
 
 class Clock {
 public:
-  inline Clock() {
+  inline Clock() {}
+
+  inline void __init__() {
     for (uint8_t i = 0;; i++) {
       if (RCC->CR & (1 << RCC_CR_HSIRDY_Pos))
         break;
@@ -34,6 +36,9 @@ public:
 class Delay {
 public:
   Delay() {
+  }
+  
+  inline void __init__() {
     RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;
     TIM4->PSC = 35;
     TIM4->ARR = 999;
@@ -52,6 +57,9 @@ public:
 class LED {
 public:
   inline LED() {
+  }
+
+  inline void __init__() {
     RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
 
     GPIOC->CRH |= (GPIO_CRH_MODE13_0 | GPIO_CRH_MODE13_1);
@@ -160,9 +168,8 @@ private:
   void configure_recieving() {
     // standart identifier
     CAN1->sFIFOMailBox[0].RIR &= ~(CAN_RI1R_IDE);
-    // CAN1->sFIFOMailBox[0].RIR |= CAN_RI1R_IDE;
 
-    // remote transmission request
+    // remove transmission request
     CAN1->sFIFOMailBox[0].RIR &= ~(CAN_RTR_DATA); // data frame
 
     // configuring filter for mailbox ex: 0 - index of filter
@@ -215,19 +222,23 @@ private:
     CAN1->FA1R |= CAN_FA1R_FACT0;
 
     CAN1->IER |= CAN_IER_FMPIE0;
-    // CAN1->IER |= CAN_IER_FFIE0;
+    CAN1->IER |= CAN_IER_FFIE0;
+
     NVIC_EnableIRQ(CAN1_RX0_IRQn);
+    // NVIC_EnableIRQ(CAN1_RX1_IRQn);
+    NVIC_EnableIRQ(CAN1_TX_IRQn);
+  }
+
+  void configure_can_interrupts() {
+    CAN1->IER |= CAN_IER_FMPIE0;
+    CAN1->IER |= CAN_IER_FFIE0;
+    NVIC_EnableIRQ(CAN1_RX0_IRQn);
+    NVIC_EnableIRQ(CAN1_TX_IRQn);
   }
 
   void can_INRQ(CAN_INRQ header) {
 
     CAN1->MCR |= CAN_MCR_INRQ;
-
-    CAN1->IER |= CAN_IER_WKUIE;
-    CAN1->IER |= CAN_IER_TMEIE;
-    NVIC_EnableIRQ(CAN1_TX_IRQn);
-
-
 
     while (!(CAN1->MSR & CAN_MSR_INAK)) {
     };
@@ -244,7 +255,9 @@ private:
   }
 
 public:
-  inline CAN(CAN_INRQ header) {
+  inline CAN() {}
+
+  inline void __init__(CAN_INRQ header) {
     RCC->APB1ENR |= RCC_APB1ENR_CAN1EN;
     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 
@@ -295,34 +308,40 @@ public:
       return error_code;
   }
 
-  uint8_t recieve() {
+  void recieve() {
     uint32_t revieved_data_hight = CAN1->sFIFOMailBox[0].RDHR;
     uint32_t revieved_data_low = CAN1->sFIFOMailBox[0].RDHR;
-    while (!(CAN1->RF0R & CAN_RF0R_FOVR0)) {
+    int32_t messages_amount = CAN1->RF0R << CAN_RF0R_FMP0_Pos;
+    while (messages_amount != 0) {
     }
-    revieved_data_hight = CAN1->sFIFOMailBox[0].RDHR;
-    revieved_data_low = CAN1->sFIFOMailBox[0].RDHR;
+    messages_amount = CAN1->RF0R << CAN_RF0R_FMP0_Pos;
     // printf("noth");
     LED().led_off();
   }
 };
 
-
-void CAN1_TX_IRQHandler(void) {
-  LED().led_off();
-}
-
-void CAN1_RX0_IRQHandler(void) {
+extern "C" void CAN1_RX0_IRQHandler(void) {
   uint8_t data = CAN1->sFIFOMailBox[0].RDLR;
   CAN1->RF0R |= CAN_RF0R_RFOM0;
   LED().led_off();
 }
 
+// extern "C" void CAN1_TX_IRQHandler(void) {
+// uint8_t data = CAN1->sFIFOMailBox[0].RDLR;
+// CAN1->RF0R |= CAN_RF0R_RFOM0;
+// LED().led_off();
+// }
+
 int main() {
   Clock clock;
+  clock.__init__();
+
+  Delay().__init__();
 
   LED led;
+  led.__init__();
   led.led_on();
+
 
   SystemCoreClockUpdate();
   __IO uint32_t clock_value = SystemCoreClock;
@@ -336,18 +355,19 @@ int main() {
   inrq_config.silent_mode = 0;
   inrq_config.tx_ID = 0;
 
-  CAN can(inrq_config);
+  CAN can;
+  can.__init__(inrq_config);
 
   uint8_t temp = 0;
-  uint8_t data[] = "fucker";
+  uint8_t data[] =
+      "mother fucker kiss by the iron fiest we are sainted by the storm";
+
+  volatile uint16_t counter = 0;
 
   // 125	0.0000	18	16	13	2	87.5	 0x001c0011
 
-  uint32_t counter = 0;
   while (1) {
-    uint8_t temp = data[counter % 5];
-    can.transmit(&temp, sizeof(temp));
-    counter++;
+    can.transmit(data, sizeof(data));
     Delay().wait(1000);
   }
 
