@@ -63,6 +63,9 @@ add_definitions(-DUSE_HAL_DRIVER -DSTM32F334x8)
  
 # Add you source file
 file(GLOB_RECURSE SOURCES
+        "Core/Src/Clock.cpp"
+        "Core/Src/Delay.cpp"
+        "Core/Src/LED.cpp"
         "Core/Src/*.*"
         "Drivers/STM32F1xx_HAL_Driver/Src/*.c"
         "startup_stm32f103xb.s"

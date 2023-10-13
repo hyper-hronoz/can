@@ -3,98 +3,35 @@
 #include "stm32f1xx.h"
 #include <stdio.h>
 #include <stdlib.h>
-
-
-#define CAN_ID_STD (0x00000000U)
-#define CAN_RTR_DATA (0x00000000U)
-
-#define DATA_LENGTH_CODE 8
-
-class Clock {
-public:
-  inline Clock() {}
-
-  inline void __init__() {
-    for (uint8_t i = 0;; i++) {
-      if (RCC->CR & (1 << RCC_CR_HSIRDY_Pos))
-        break;
-      if (i == 255)
-        return;
-    }
-    RCC->CFGR |= RCC_CFGR_PLLMULL9;
-    RCC->CFGR |= RCC_CFGR_SW_1;
-    RCC->CFGR &= ~(RCC_CFGR_PLLSRC);
-    RCC->CR |= RCC_CR_PLLON;
-    for (uint8_t i = 0;; i++) {
-      if (RCC->CR & (1U << RCC_CR_PLLRDY_Pos))
-        break;
-      if (i == 255) {
-        RCC->CR &= ~(1U << RCC_CR_PLLON_Pos);
-      }
-    }
-  }
-};
-
-class Delay {
-public:
-  Delay() {}
-
-  inline void __init__() {
-    RCC->APB1ENR |= RCC_APB1ENR_TIM4EN;
-    TIM4->PSC = 35;
-    TIM4->ARR = 999;
-    TIM4->CR1 |= TIM_CR1_CEN;
-  }
-
-  void wait(uint32_t ms) {
-    for (uint16_t i = 0; i < ms; i++) {
-      TIM4->SR &= ~(0b1 << 0);
-      while (!(TIM4->SR & (0b1 << 0))) {
-      }
-    }
-  }
-};
-
-class LED {
-public:
-  inline LED() {}
-
-  inline void __init__() {
-    RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
-
-    GPIOC->CRH |= (GPIO_CRH_MODE13_0 | GPIO_CRH_MODE13_1);
-    GPIOC->CRH &= ~(GPIO_CRH_CNF13_0 | GPIO_CRH_CNF13_1);
-
-    this->led_off();
-  }
-
-  inline void led_on() { GPIOC->ODR &= ~(GPIO_ODR_ODR13); }
-
-  inline void led_off() { GPIOC->ODR |= GPIO_ODR_ODR13; }
-
-  inline void led_toggle() { GPIOC->ODR ^= GPIO_ODR_ODR13; }
-};
+#include "Delay.h"
+#include "Clock.h"
+#include "LED.h"
+#include <time.h>
 
 class CAN {
 private:
-  void configure_can_gpio_rx() {
+  void configure_gpio_rx() {
+    // GPIOA->CRH &= ~(GPIO_CRH_MODE11_Msk);
+    // GPIOA->CRH &= ~(GPIO_CRH_CNF11_Msk);
+    // GPIOA->CRH |= GPIO_CRH_CNF11_1;
+    
     GPIOA->CRH &= ~GPIO_CRH_CNF11;
     GPIOA->CRH |= GPIO_CRH_CNF11_1;
     GPIOA->CRH |= GPIO_CRH_MODE11;
   }
 
-  void configure_can_gpio_tx() {
+  void configure_gpio_tx() {
     GPIOA->CRH &= ~GPIO_CRH_CNF12;
     GPIOA->CRH |= GPIO_CRH_CNF12_1;
     GPIOA->CRH |= GPIO_CRH_MODE12;
   }
 
-  void configure_can_gpio() {
-    this->configure_can_gpio_tx();
-    this->configure_can_gpio_rx();
+  void configure_gpio() {
+    this->configure_gpio_tx();
+    this->configure_gpio_rx();
   }
 
-  void configure_can_timings(CAN_bit_timing_INRQ header) {
+  void configure_timings(CAN_bit_timing_INRQ header) {
     CAN1->BTR &= ~(CAN_BTR_LBKM_Msk);
     CAN1->BTR |= (header.loop_back << CAN_BTR_LBKM_Pos);
 
@@ -113,7 +50,7 @@ private:
     CAN1->BTR |= (header.SJW << CAN_BTR_SJW_Pos);
   }
 
-  void configure_can_tx_mailboxes(CAN_Tx_INRQ header) {
+  void configure_tx_mailboxes(CAN_Tx_INRQ header) {
     CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_RTR;
     CAN1->sTxMailBox[0].TIR &= ~CAN_TI0R_IDE;
 
@@ -125,11 +62,13 @@ private:
   }
 
   void configure_recieving(CAN_Rx_INRQ header) {
-    // standart identifier
+    // identifier
     CAN1->sFIFOMailBox[0].RIR &= ~(CAN_RI1R_IDE);
+    CAN1->sFIFOMailBox[0].RIR |= (header.extended_id << CAN_RI1R_IDE_Pos);
 
     // remove transmission request
-    CAN1->sFIFOMailBox[0].RIR &= ~(CAN_RTR_DATA); // data frame
+    CAN1->sFIFOMailBox[0].RIR &= ~(CAN_RI1R_RTR_Msk); // data frame
+    CAN1->sFIFOMailBox[0].RIR |= (header.remote_transmission_req << CAN_RI1R_RTR_Pos); // data frame
 
     // configuring filter for mailbox ex: 0 - index of filter
     CAN1->sFIFOMailBox[0].RDTR &= ~(CAN_RDT0R_FMI_Msk);
@@ -140,28 +79,9 @@ private:
     CAN1->sFIFOMailBox[0].RDTR |= (header.data_length << CAN_RDT0R_DLC_Pos);
   }
 
-  void filter_to_mask() { CAN1->FM1R &= ~(CAN_FM1R_FBM0); }
-
-  void filter_to_list() {
-    CAN1->FM1R &= ~(CAN_FM1R_FBM0);
-    CAN1->FM1R |= CAN_FM1R_FBM0;
-  }
-
-  void filter_to_fifo0() { CAN1->FFA1R &= ~(CAN_FFA1R_FFA0); }
-
-  void filter_to_fifo1() {
-    CAN1->FFA1R &= ~(CAN_FFA1R_FFA0);
-    CAN1->FFA1R |= CAN_FFA1R_FFA0;
-  }
-
-  void filter_to_32bit_scale() {
-    CAN1->FS1R &= ~(CAN_FS1R_FSC0);
-    CAN1->FS1R |= CAN_FS1R_FSC0;
-  }
-
   void filter_to_two_16bit_scale() { CAN1->FS1R &= ~(CAN_FS1R_FSC0); }
 
-  void configure_can_filter(CAN_filter_INRQ header) {
+  void configure_filter(CAN_filter_INRQ header) {
     CAN1->FMR |= CAN_FMR_FINIT;
 
     // list mode strict filtering
@@ -172,19 +92,19 @@ private:
     CAN1->FS1R &= ~(CAN_FS1R_FSC0);
     CAN1->FS1R |= (header.scale_32_enable << header.filter_position);
 
-    // filter 0 id 2
     CAN1->sFilterRegister[0].FR1 = header.filter_bank1;
     CAN1->sFilterRegister[0].FR2 = header.filter_bank2;
 
-    this->filter_to_fifo0();
+    CAN1->FFA1R &= ~(1 << header.filter_position);
+    CAN1->FFA1R |= (header.fifo1_enable << header.filter_position);
 
     CAN1->FMR &= ~(CAN_FMR_FINIT);
 
-    // activate filter 0
-    CAN1->FA1R |= CAN_FA1R_FACT0;
+    // activate filter
+    CAN1->FA1R |= (1 << header.filter_position);
   }
 
-  void configure_can_interrupts() {
+  void configure_interrupts() {
     CAN1->IER |= CAN_IER_FMPIE0;
     CAN1->IER |= CAN_IER_FFIE0;
 
@@ -202,11 +122,11 @@ private:
     CAN1->MCR |= CAN_MCR_NART;
     CAN1->MCR |= CAN_MCR_AWUM;
 
-    this->configure_can_timings(header.can_bit_timing);
-    this->configure_can_tx_mailboxes(header.can_tx);
+    this->configure_timings(header.can_bit_timing);
+    this->configure_tx_mailboxes(header.can_tx);
     this->configure_recieving(header.can_rx);
-    this->configure_can_filter(header.can_filter);
-    this->configure_can_interrupts();
+    this->configure_filter(header.can_filter);
+    this->configure_interrupts();
 
     CAN1->MCR &= ~CAN_MCR_INRQ;
   }
@@ -218,11 +138,11 @@ public:
     RCC->APB1ENR |= RCC_APB1ENR_CAN1EN;
     RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 
-    this->configure_can_gpio();
+    this->configure_gpio();
     this->can_INRQ(header);
   }
 
-  uint8_t transmit(uint8_t *pData, uint8_t dataLength) {
+  uint8_t transmit(uint8_t *pData, uint8_t dataLength, CAN_Tx_INRQ header) {
     uint16_t i = 0;
     uint8_t j = 0;
     while (!(CAN1->TSR & CAN_TSR_TME0)) {
@@ -234,7 +154,7 @@ public:
     CAN1->sTxMailBox[0].TDLR = 0;
     CAN1->sTxMailBox[0].TDHR = 0;
     while (i < dataLength) {
-      if (i > (DATA_LENGTH_CODE - 1)) {
+      if (i > (header.data_length - 1)) {
         CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ;
         dataLength -= i;
         j++;
@@ -251,15 +171,16 @@ public:
       }
       if (i < 4)
         CAN1->sTxMailBox[0].TDLR |=
-            (pData[i + j * DATA_LENGTH_CODE] * 1U << (i * 8));
+            (pData[i + j * header.data_length] * 1U << (i * 8));
       else
         CAN1->sTxMailBox[0].TDHR |=
-            (pData[i + j * DATA_LENGTH_CODE] * 1U << (i * 8 - 32));
+            (pData[i + j * header.data_length] * 1U << (i * 8 - 32));
       i++;
     }
     CAN1->sTxMailBox[0].TIR |= CAN_TI0R_TXRQ;
     uint8_t error_code = ((CAN1->ESR & CAN_ESR_LEC) >> CAN_ESR_LEC_Pos);
-    if (CAN1->TSR & CAN_TSR_TXOK0)
+    uint8_t ts_ok = CAN1->TSR << CAN_TSR_TXOK0_Pos;
+    if (ts_ok)
       return 0;
     else
       return error_code;
@@ -331,15 +252,16 @@ int main() {
 
   uint8_t temp = 0;
   uint8_t data[] =
-      "iother fucker kiss by the iron fiest we are sainted by the storm";
+      "hi";
 
   volatile uint16_t counter = 0;
 
   // 125	0.0000	18	16	13	2	87.5	 0x001c0011
 
   while (1) {
-    can.transmit(data, sizeof(data));
-    Delay().wait(1000);
+    can.transmit(data, sizeof(data), inrq_config.can_tx);
+    Delay().wait(200);
+    LED().led_toggle();
   }
 
   return 0;

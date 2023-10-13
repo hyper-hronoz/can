@@ -129,6 +129,78 @@ can.elf/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/can.elf.dir/build.make CMakeFiles/can.elf.dir/build
 .PHONY : can.elf/fast
 
+Core/Src/Clock.obj: Core/Src/Clock.cpp.obj
+.PHONY : Core/Src/Clock.obj
+
+# target to build an object file
+Core/Src/Clock.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/can.elf.dir/build.make CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+.PHONY : Core/Src/Clock.cpp.obj
+
+Core/Src/Clock.i: Core/Src/Clock.cpp.i
+.PHONY : Core/Src/Clock.i
+
+# target to preprocess a source file
+Core/Src/Clock.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/can.elf.dir/build.make CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.i
+.PHONY : Core/Src/Clock.cpp.i
+
+Core/Src/Clock.s: Core/Src/Clock.cpp.s
+.PHONY : Core/Src/Clock.s
+
+# target to generate assembly for a file
+Core/Src/Clock.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/can.elf.dir/build.make CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.s
+.PHONY : Core/Src/Clock.cpp.s
+
+Core/Src/Delay.obj: Core/Src/Delay.cpp.obj
+.PHONY : Core/Src/Delay.obj
+
+# target to build an object file
+Core/Src/Delay.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/can.elf.dir/build.make CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
+.PHONY : Core/Src/Delay.cpp.obj
+
+Core/Src/Delay.i: Core/Src/Delay.cpp.i
+.PHONY : Core/Src/Delay.i
+
+# target to preprocess a source file
+Core/Src/Delay.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/can.elf.dir/build.make CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.i
+.PHONY : Core/Src/Delay.cpp.i
+
+Core/Src/Delay.s: Core/Src/Delay.cpp.s
+.PHONY : Core/Src/Delay.s
+
+# target to generate assembly for a file
+Core/Src/Delay.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/can.elf.dir/build.make CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.s
+.PHONY : Core/Src/Delay.cpp.s
+
+Core/Src/LED.obj: Core/Src/LED.cpp.obj
+.PHONY : Core/Src/LED.obj
+
+# target to build an object file
+Core/Src/LED.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/can.elf.dir/build.make CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+.PHONY : Core/Src/LED.cpp.obj
+
+Core/Src/LED.i: Core/Src/LED.cpp.i
+.PHONY : Core/Src/LED.i
+
+# target to preprocess a source file
+Core/Src/LED.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/can.elf.dir/build.make CMakeFiles/can.elf.dir/Core/Src/LED.cpp.i
+.PHONY : Core/Src/LED.cpp.i
+
+Core/Src/LED.s: Core/Src/LED.cpp.s
+.PHONY : Core/Src/LED.s
+
+# target to generate assembly for a file
+Core/Src/LED.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/can.elf.dir/build.make CMakeFiles/can.elf.dir/Core/Src/LED.cpp.s
+.PHONY : Core/Src/LED.cpp.s
+
 Core/Src/main.obj: Core/Src/main.cpp.obj
 .PHONY : Core/Src/main.obj
 
@@ -554,6 +626,15 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... can.elf"
+	@echo "... Core/Src/Clock.obj"
+	@echo "... Core/Src/Clock.i"
+	@echo "... Core/Src/Clock.s"
+	@echo "... Core/Src/Delay.obj"
+	@echo "... Core/Src/Delay.i"
+	@echo "... Core/Src/Delay.s"
+	@echo "... Core/Src/LED.obj"
+	@echo "... Core/Src/LED.i"
+	@echo "... Core/Src/LED.s"
 	@echo "... Core/Src/main.obj"
 	@echo "... Core/Src/main.i"
 	@echo "... Core/Src/main.s"
