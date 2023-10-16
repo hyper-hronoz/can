@@ -19,19 +19,15 @@ class UART {
       GPIOB->CRL |= GPIO_CRL_CNF6_1;
     }
 
-    void configure_rcc() {
-      RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
-    }
-
     void configure_UART() {
-
     }
 
   public:
     void __init__() {
+      RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
+
       this->configure_GPIO_recieve();
       this->configure_GPIO_transmit();
-      this->configure_rcc();
     }
 
     void recieve() {
