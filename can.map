@@ -105,7 +105,9 @@ Discarded input sections
  .text          0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
  .data          0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
  .bss           0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
- .ARM.extab.text._ZN5Clock8__init__Ev
+ .ARM.extab.text._ZN5Clock20configure_APB1_clockE24Clock_configuration_INRQ
+                0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+ .ARM.extab.text._ZN5Clock20configure_APB2_clockE24Clock_configuration_INRQ
                 0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
  .text          0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
  .data          0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
@@ -113,6 +115,8 @@ Discarded input sections
  .ARM.extab.text._ZN5Delay8__init__Ev
                 0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
  .ARM.extab.text._ZN5Delay4waitEm
+                0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
+ .ARM.extab.text._ZN5Delay7timeoutERVmmm
                 0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
  .text          0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
  .data          0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
@@ -125,6 +129,14 @@ Discarded input sections
                 0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
  .ARM.extab.text._ZN3LED10led_toggleEv
                 0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+ .text          0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/UART.cpp.obj
+ .data          0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/UART.cpp.obj
+ .bss           0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/UART.cpp.obj
+ .debug_line    0x0000000000000000        0x0 CMakeFiles/can.elf.dir/Core/Src/UART.cpp.obj
+ .debug_str     0x0000000000000000       0xbe CMakeFiles/can.elf.dir/Core/Src/UART.cpp.obj
+ .comment       0x0000000000000000       0x46 CMakeFiles/can.elf.dir/Core/Src/UART.cpp.obj
+ .ARM.attributes
+                0x0000000000000000       0x2d CMakeFiles/can.elf.dir/Core/Src/UART.cpp.obj
  .group         0x0000000000000000       0x28 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .group         0x0000000000000000       0x14 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .group         0x0000000000000000       0x14 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
@@ -1168,6 +1180,7 @@ LOAD /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thum
 LOAD CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
 LOAD CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
 LOAD CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+LOAD CMakeFiles/can.elf.dir/Core/Src/UART.cpp.obj
 LOAD CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
 LOAD CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_hal_msp.c.obj
 LOAD CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
@@ -1210,7 +1223,7 @@ LOAD /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtn.o
                 0x0000000008000000                g_pfnVectors
                 0x000000000800010c                . = ALIGN (0x4)
 
-.text           0x000000000800010c     0x1d74
+.text           0x000000000800010c     0x1ef8
                 0x000000000800010c                . = ALIGN (0x4)
  *(.text)
  .text          0x000000000800010c      0x1ac /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(libunwind.o)
@@ -1247,470 +1260,503 @@ LOAD /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtn.o
                 0x00000000080003e4       0x28 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtbegin.o
  .text.frame_dummy
                 0x000000000800040c       0x24 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtbegin.o
- .text._ZN5Clock8__init__Ev
-                0x0000000008000430       0xa8 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
-                0x0000000008000430                Clock::__init__()
+ .text._ZN5Clock20configure_APB1_clockE24Clock_configuration_INRQ
+                0x0000000008000430       0x38 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+                0x0000000008000430                Clock::configure_APB1_clock(Clock_configuration_INRQ)
+ .text._ZN5Clock20configure_APB2_clockE24Clock_configuration_INRQ
+                0x0000000008000468       0x18 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+                0x0000000008000468                Clock::configure_APB2_clock(Clock_configuration_INRQ)
+ .text._ZN5Clock22configure_clock_sourceE10Clock_INRQ
+                0x0000000008000480       0xc4 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+                0x0000000008000480                Clock::configure_clock_source(Clock_INRQ)
+ .text._ZN5Clock8__init__E10Clock_INRQ
+                0x0000000008000544       0x38 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+                0x0000000008000544                Clock::__init__(Clock_INRQ)
  .text._ZN5Delay8__init__Ev
-                0x00000000080004d8       0x40 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
-                0x00000000080004d8                Delay::__init__()
+                0x000000000800057c       0x40 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
+                0x000000000800057c                Delay::__init__()
  .text._ZN5Delay4waitEm
-                0x0000000008000518       0x54 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
-                0x0000000008000518                Delay::wait(unsigned long)
+                0x00000000080005bc       0x54 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
+                0x00000000080005bc                Delay::wait(unsigned long)
+ .text._ZN5Delay7timeoutERVmmm
+                0x0000000008000610       0x52 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
+                0x0000000008000610                Delay::timeout(unsigned long volatile&, unsigned long, unsigned long)
+ *fill*         0x0000000008000662        0x2 
  .text._ZN3LED8__init__Ev
-                0x000000000800056c       0x44 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
-                0x000000000800056c                LED::__init__()
+                0x0000000008000664       0x44 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+                0x0000000008000664                LED::__init__()
  .text._ZN3LED6led_onEv
-                0x00000000080005b0       0x24 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
-                0x00000000080005b0                LED::led_on()
+                0x00000000080006a8       0x24 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+                0x00000000080006a8                LED::led_on()
  .text._ZN3LED7led_offEv
-                0x00000000080005d4       0x24 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
-                0x00000000080005d4                LED::led_off()
+                0x00000000080006cc       0x24 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+                0x00000000080006cc                LED::led_off()
  .text._ZN3LED10led_toggleEv
-                0x00000000080005f8       0x24 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
-                0x00000000080005f8                LED::led_toggle()
+                0x00000000080006f0       0x24 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+                0x00000000080006f0                LED::led_toggle()
+ .text._ZN3LED21led_timeout_exceptionEv
+                0x0000000008000714       0x5a CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+                0x0000000008000714                LED::led_timeout_exception()
+ *fill*         0x000000000800076e        0x2 
  .text.__NVIC_EnableIRQ
-                0x000000000800061c       0x38 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008000770       0x38 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .text._ZN3CAN17configure_gpio_rxEv
-                0x0000000008000654       0x3c CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                0x0000000008000654                CAN::configure_gpio_rx()
+                0x00000000080007a8       0x3c CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x00000000080007a8                CAN::configure_gpio_rx()
  .text._ZN3CAN17configure_gpio_txEv
-                0x0000000008000690       0x3c CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                0x0000000008000690                CAN::configure_gpio_tx()
+                0x00000000080007e4       0x3c CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x00000000080007e4                CAN::configure_gpio_tx()
  .text._ZN3CAN14configure_gpioEv
-                0x00000000080006cc       0x1c CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                0x00000000080006cc                CAN::configure_gpio()
+                0x0000000008000820       0x1c CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008000820                CAN::configure_gpio()
  .text._ZN3CAN17configure_timingsE19CAN_bit_timing_INRQ
-                0x00000000080006e8       0xc4 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                0x00000000080006e8                CAN::configure_timings(CAN_bit_timing_INRQ)
+                0x000000000800083c       0xc4 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800083c                CAN::configure_timings(CAN_bit_timing_INRQ)
  .text._ZN3CAN22configure_tx_mailboxesE11CAN_Tx_INRQ
-                0x00000000080007ac       0x7c CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                0x00000000080007ac                CAN::configure_tx_mailboxes(CAN_Tx_INRQ)
+                0x0000000008000900       0x7c CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008000900                CAN::configure_tx_mailboxes(CAN_Tx_INRQ)
  .text._ZN3CAN19configure_recievingE11CAN_Rx_INRQ
-                0x0000000008000828       0xa4 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                0x0000000008000828                CAN::configure_recieving(CAN_Rx_INRQ)
+                0x000000000800097c       0xa4 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800097c                CAN::configure_recieving(CAN_Rx_INRQ)
  .text._ZN3CAN16configure_filterE15CAN_filter_INRQ
-                0x00000000080008cc       0xec CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                0x00000000080008cc                CAN::configure_filter(CAN_filter_INRQ)
+                0x0000000008000a20       0xec CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008000a20                CAN::configure_filter(CAN_filter_INRQ)
  .text._ZN3CAN20configure_interruptsEv
-                0x00000000080009b8       0x38 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                0x00000000080009b8                CAN::configure_interrupts()
+                0x0000000008000b0c       0x38 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008000b0c                CAN::configure_interrupts()
  .text._ZN3CAN8can_INRQE8CAN_INRQ
-                0x00000000080009f0       0xa8 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                0x00000000080009f0                CAN::can_INRQ(CAN_INRQ)
+                0x0000000008000b44       0xa8 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008000b44                CAN::can_INRQ(CAN_INRQ)
  .text._ZN3CANC2Ev
-                0x0000000008000a98       0x14 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                0x0000000008000a98                CAN::CAN()
-                0x0000000008000a98                CAN::CAN()
+                0x0000000008000bec       0x14 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008000bec                CAN::CAN()
+                0x0000000008000bec                CAN::CAN()
  .text._ZN3CAN8__init__E8CAN_INRQ
-                0x0000000008000aac       0x60 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                0x0000000008000aac                CAN::__init__(CAN_INRQ)
+                0x0000000008000c00       0x60 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008000c00                CAN::__init__(CAN_INRQ)
  .text._ZN3CAN8transmitEPhh11CAN_Tx_INRQ
-                0x0000000008000b0c      0x180 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                0x0000000008000b0c                CAN::transmit(unsigned char*, unsigned char, CAN_Tx_INRQ)
+                0x0000000008000c60      0x180 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008000c60                CAN::transmit(unsigned char*, unsigned char, CAN_Tx_INRQ)
  .text._ZN3CAN7recieveE11CAN_Rx_INRQ
-                0x0000000008000c8c       0xc0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                0x0000000008000c8c                CAN::recieve(CAN_Rx_INRQ)
+                0x0000000008000de0       0xc0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008000de0                CAN::recieve(CAN_Rx_INRQ)
  .text.USB_LP_CAN1_RX0_IRQHandler
-                0x0000000008000d4c       0x30 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                0x0000000008000d4c                USB_LP_CAN1_RX0_IRQHandler
- .text.main     0x0000000008000d7c      0x114 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                0x0000000008000d7c                main
+                0x0000000008000ea0       0x30 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008000ea0                USB_LP_CAN1_RX0_IRQHandler
+ .text.main     0x0000000008000ed0      0x144 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008000ed0                main
  .text.NMI_Handler
-                0x0000000008000e90        0x6 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
-                0x0000000008000e90                NMI_Handler
+                0x0000000008001014        0x6 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+                0x0000000008001014                NMI_Handler
  .text.HardFault_Handler
-                0x0000000008000e96        0x6 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
-                0x0000000008000e96                HardFault_Handler
+                0x000000000800101a        0x6 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+                0x000000000800101a                HardFault_Handler
  .text.MemManage_Handler
-                0x0000000008000e9c        0x6 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
-                0x0000000008000e9c                MemManage_Handler
+                0x0000000008001020        0x6 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+                0x0000000008001020                MemManage_Handler
  .text.BusFault_Handler
-                0x0000000008000ea2        0x6 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
-                0x0000000008000ea2                BusFault_Handler
+                0x0000000008001026        0x6 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+                0x0000000008001026                BusFault_Handler
  .text.UsageFault_Handler
-                0x0000000008000ea8        0x6 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
-                0x0000000008000ea8                UsageFault_Handler
+                0x000000000800102c        0x6 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+                0x000000000800102c                UsageFault_Handler
  .text.SVC_Handler
-                0x0000000008000eae        0xc CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
-                0x0000000008000eae                SVC_Handler
+                0x0000000008001032        0xc CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+                0x0000000008001032                SVC_Handler
  .text.DebugMon_Handler
-                0x0000000008000eba        0xc CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
-                0x0000000008000eba                DebugMon_Handler
+                0x000000000800103e        0xc CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+                0x000000000800103e                DebugMon_Handler
  .text.PendSV_Handler
-                0x0000000008000ec6        0xc CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
-                0x0000000008000ec6                PendSV_Handler
+                0x000000000800104a        0xc CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+                0x000000000800104a                PendSV_Handler
  .text.SysTick_Handler
-                0x0000000008000ed2        0xc CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
-                0x0000000008000ed2                SysTick_Handler
+                0x0000000008001056        0xc CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+                0x0000000008001056                SysTick_Handler
  .text.SystemInit
-                0x0000000008000ede        0xc CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
-                0x0000000008000ede                SystemInit
- *fill*         0x0000000008000eea        0x2 
+                0x0000000008001062        0xc CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
+                0x0000000008001062                SystemInit
+ *fill*         0x000000000800106e        0x2 
  .text.SystemCoreClockUpdate
-                0x0000000008000eec       0xe4 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
-                0x0000000008000eec                SystemCoreClockUpdate
+                0x0000000008001070       0xe4 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
+                0x0000000008001070                SystemCoreClockUpdate
  .text.HAL_IncTick
-                0x0000000008000fd0       0x24 CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
-                0x0000000008000fd0                HAL_IncTick
+                0x0000000008001154       0x24 CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
+                0x0000000008001154                HAL_IncTick
  .text.Reset_Handler
-                0x0000000008000ff4       0x48 CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
-                0x0000000008000ff4                Reset_Handler
+                0x0000000008001178       0x48 CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
+                0x0000000008001178                Reset_Handler
  .text.Default_Handler
-                0x000000000800103c        0x2 CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
-                0x000000000800103c                RTC_Alarm_IRQHandler
-                0x000000000800103c                EXTI2_IRQHandler
-                0x000000000800103c                TIM1_CC_IRQHandler
-                0x000000000800103c                PVD_IRQHandler
-                0x000000000800103c                EXTI3_IRQHandler
-                0x000000000800103c                EXTI0_IRQHandler
-                0x000000000800103c                I2C2_EV_IRQHandler
-                0x000000000800103c                ADC1_2_IRQHandler
-                0x000000000800103c                SPI1_IRQHandler
-                0x000000000800103c                TAMPER_IRQHandler
-                0x000000000800103c                DMA1_Channel4_IRQHandler
-                0x000000000800103c                USART3_IRQHandler
-                0x000000000800103c                RTC_IRQHandler
-                0x000000000800103c                DMA1_Channel7_IRQHandler
-                0x000000000800103c                CAN1_RX1_IRQHandler
-                0x000000000800103c                TIM4_IRQHandler
-                0x000000000800103c                I2C1_EV_IRQHandler
-                0x000000000800103c                DMA1_Channel6_IRQHandler
-                0x000000000800103c                TIM3_IRQHandler
-                0x000000000800103c                RCC_IRQHandler
-                0x000000000800103c                TIM1_TRG_COM_IRQHandler
-                0x000000000800103c                DMA1_Channel1_IRQHandler
-                0x000000000800103c                Default_Handler
-                0x000000000800103c                EXTI15_10_IRQHandler
-                0x000000000800103c                EXTI9_5_IRQHandler
-                0x000000000800103c                SPI2_IRQHandler
-                0x000000000800103c                DMA1_Channel5_IRQHandler
-                0x000000000800103c                EXTI4_IRQHandler
-                0x000000000800103c                USB_HP_CAN1_TX_IRQHandler
-                0x000000000800103c                DMA1_Channel3_IRQHandler
-                0x000000000800103c                TIM1_UP_IRQHandler
-                0x000000000800103c                WWDG_IRQHandler
-                0x000000000800103c                TIM2_IRQHandler
-                0x000000000800103c                TIM1_BRK_IRQHandler
-                0x000000000800103c                EXTI1_IRQHandler
-                0x000000000800103c                USART2_IRQHandler
-                0x000000000800103c                I2C2_ER_IRQHandler
-                0x000000000800103c                DMA1_Channel2_IRQHandler
-                0x000000000800103c                CAN1_SCE_IRQHandler
-                0x000000000800103c                FLASH_IRQHandler
-                0x000000000800103c                USART1_IRQHandler
-                0x000000000800103c                I2C1_ER_IRQHandler
-                0x000000000800103c                USBWakeUp_IRQHandler
- *fill*         0x000000000800103e        0x2 
+                0x00000000080011c0        0x2 CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
+                0x00000000080011c0                RTC_Alarm_IRQHandler
+                0x00000000080011c0                EXTI2_IRQHandler
+                0x00000000080011c0                TIM1_CC_IRQHandler
+                0x00000000080011c0                PVD_IRQHandler
+                0x00000000080011c0                EXTI3_IRQHandler
+                0x00000000080011c0                EXTI0_IRQHandler
+                0x00000000080011c0                I2C2_EV_IRQHandler
+                0x00000000080011c0                ADC1_2_IRQHandler
+                0x00000000080011c0                SPI1_IRQHandler
+                0x00000000080011c0                TAMPER_IRQHandler
+                0x00000000080011c0                DMA1_Channel4_IRQHandler
+                0x00000000080011c0                USART3_IRQHandler
+                0x00000000080011c0                RTC_IRQHandler
+                0x00000000080011c0                DMA1_Channel7_IRQHandler
+                0x00000000080011c0                CAN1_RX1_IRQHandler
+                0x00000000080011c0                TIM4_IRQHandler
+                0x00000000080011c0                I2C1_EV_IRQHandler
+                0x00000000080011c0                DMA1_Channel6_IRQHandler
+                0x00000000080011c0                TIM3_IRQHandler
+                0x00000000080011c0                RCC_IRQHandler
+                0x00000000080011c0                TIM1_TRG_COM_IRQHandler
+                0x00000000080011c0                DMA1_Channel1_IRQHandler
+                0x00000000080011c0                Default_Handler
+                0x00000000080011c0                EXTI15_10_IRQHandler
+                0x00000000080011c0                EXTI9_5_IRQHandler
+                0x00000000080011c0                SPI2_IRQHandler
+                0x00000000080011c0                DMA1_Channel5_IRQHandler
+                0x00000000080011c0                EXTI4_IRQHandler
+                0x00000000080011c0                USB_HP_CAN1_TX_IRQHandler
+                0x00000000080011c0                DMA1_Channel3_IRQHandler
+                0x00000000080011c0                TIM1_UP_IRQHandler
+                0x00000000080011c0                WWDG_IRQHandler
+                0x00000000080011c0                TIM2_IRQHandler
+                0x00000000080011c0                TIM1_BRK_IRQHandler
+                0x00000000080011c0                EXTI1_IRQHandler
+                0x00000000080011c0                USART2_IRQHandler
+                0x00000000080011c0                I2C2_ER_IRQHandler
+                0x00000000080011c0                DMA1_Channel2_IRQHandler
+                0x00000000080011c0                CAN1_SCE_IRQHandler
+                0x00000000080011c0                FLASH_IRQHandler
+                0x00000000080011c0                USART1_IRQHandler
+                0x00000000080011c0                I2C1_ER_IRQHandler
+                0x00000000080011c0                USBWakeUp_IRQHandler
+ *fill*         0x00000000080011c2        0x2 
  .text.selfrel_offset31
-                0x0000000008001040       0x14 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080011c4       0x14 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .text.search_EIT_table
-                0x0000000008001054       0x64 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080011d8       0x64 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .text.__gnu_unwind_get_pr_addr
-                0x00000000080010b8       0x28 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x000000000800123c       0x28 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .text.get_eit_entry
-                0x00000000080010e0       0x94 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x0000000008001264       0x94 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .text.restore_non_core_regs
-                0x0000000008001174       0x58 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080012f8       0x58 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .text._Unwind_decode_typeinfo_ptr.constprop.0
-                0x00000000080011cc        0xc /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x0000000008001350        0xc /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .text._Unwind_DebugHook
-                0x00000000080011d8        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x000000000800135c        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .text.unwind_phase2
-                0x00000000080011dc       0x3c /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x0000000008001360       0x3c /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .text.unwind_phase2_forced
-                0x0000000008001218       0xe0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x000000000800139c       0xe0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .text.__gnu_Unwind_RaiseException
-                0x00000000080012f8       0x68 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
-                0x00000000080012f8                __gnu_Unwind_RaiseException
+                0x000000000800147c       0x68 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x000000000800147c                __gnu_Unwind_RaiseException
  .text.__gnu_Unwind_ForcedUnwind
-                0x0000000008001360       0x18 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
-                0x0000000008001360                __gnu_Unwind_ForcedUnwind
+                0x00000000080014e4       0x18 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080014e4                __gnu_Unwind_ForcedUnwind
  .text.__gnu_Unwind_Resume
-                0x0000000008001378       0x40 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
-                0x0000000008001378                __gnu_Unwind_Resume
+                0x00000000080014fc       0x40 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080014fc                __gnu_Unwind_Resume
  .text.__gnu_Unwind_Resume_or_Rethrow
-                0x00000000080013b8       0x18 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
-                0x00000000080013b8                __gnu_Unwind_Resume_or_Rethrow
+                0x000000000800153c       0x18 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x000000000800153c                __gnu_Unwind_Resume_or_Rethrow
  .text._Unwind_VRS_Get
-                0x00000000080013d0       0x30 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
-                0x00000000080013d0                _Unwind_VRS_Get
+                0x0000000008001554       0x30 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x0000000008001554                _Unwind_VRS_Get
  .text._Unwind_GetGR
-                0x0000000008001400       0x1c /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x0000000008001584       0x1c /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .text._Unwind_VRS_Set
-                0x000000000800141c       0x30 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
-                0x000000000800141c                _Unwind_VRS_Set
+                0x00000000080015a0       0x30 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080015a0                _Unwind_VRS_Set
  .text._Unwind_SetGR
-                0x000000000800144c       0x18 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080015d0       0x18 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .text.__gnu_Unwind_Backtrace
-                0x0000000008001464       0x80 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
-                0x0000000008001464                __gnu_Unwind_Backtrace
+                0x00000000080015e8       0x80 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080015e8                __gnu_Unwind_Backtrace
  .text.__gnu_unwind_pr_common
-                0x00000000080014e4      0x298 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x0000000008001668      0x298 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .text.__aeabi_unwind_cpp_pr0
-                0x000000000800177c        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
-                0x000000000800177c                __aeabi_unwind_cpp_pr0
+                0x0000000008001900        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x0000000008001900                __aeabi_unwind_cpp_pr0
  .text.__aeabi_unwind_cpp_pr1
-                0x0000000008001784        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
-                0x0000000008001784                __aeabi_unwind_cpp_pr1
+                0x0000000008001908        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x0000000008001908                __aeabi_unwind_cpp_pr1
  .text.__aeabi_unwind_cpp_pr2
-                0x000000000800178c        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
-                0x000000000800178c                __aeabi_unwind_cpp_pr2
+                0x0000000008001910        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x0000000008001910                __aeabi_unwind_cpp_pr2
  .text._Unwind_VRS_Pop
-                0x0000000008001794      0x2a0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
-                0x0000000008001794                _Unwind_VRS_Pop
+                0x0000000008001918      0x2a0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x0000000008001918                _Unwind_VRS_Pop
  .text.next_unwind_byte
-                0x0000000008001a34       0x38 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(pr-support.o)
+                0x0000000008001bb8       0x38 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(pr-support.o)
  .text.__gnu_unwind_execute
-                0x0000000008001a6c      0x2d4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(pr-support.o)
-                0x0000000008001a6c                __gnu_unwind_execute
+                0x0000000008001bf0      0x2d4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(pr-support.o)
+                0x0000000008001bf0                __gnu_unwind_execute
  .text.startup.register_fini
-                0x0000000008001d40       0x14 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__call_atexit.o)
+                0x0000000008001ec4       0x14 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__call_atexit.o)
  .text.__libc_init_array
-                0x0000000008001d54       0x50 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-init.o)
-                0x0000000008001d54                __libc_init_array
+                0x0000000008001ed8       0x50 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-init.o)
+                0x0000000008001ed8                __libc_init_array
  .text.__libc_fini_array
-                0x0000000008001da4       0x28 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fini.o)
-                0x0000000008001da4                __libc_fini_array
+                0x0000000008001f28       0x28 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fini.o)
+                0x0000000008001f28                __libc_fini_array
  .text.__retarget_lock_acquire_recursive
-                0x0000000008001dcc        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lock.o)
-                0x0000000008001dcc                __retarget_lock_acquire_recursive
+                0x0000000008001f50        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lock.o)
+                0x0000000008001f50                __retarget_lock_acquire_recursive
  .text.__retarget_lock_release_recursive
-                0x0000000008001dd0        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lock.o)
-                0x0000000008001dd0                __retarget_lock_release_recursive
- .text.atexit   0x0000000008001dd4        0xc /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-atexit.o)
-                0x0000000008001dd4                atexit
+                0x0000000008001f54        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lock.o)
+                0x0000000008001f54                __retarget_lock_release_recursive
+ .text.atexit   0x0000000008001f58        0xc /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-atexit.o)
+                0x0000000008001f58                atexit
  .text.__register_exitproc
-                0x0000000008001de0       0x88 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__atexit.o)
-                0x0000000008001de0                __register_exitproc
+                0x0000000008001f64       0x88 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__atexit.o)
+                0x0000000008001f64                __register_exitproc
  *(.glue_7)
- .glue_7        0x0000000008001e68        0x0 linker stubs
+ .glue_7        0x0000000008001fec        0x0 linker stubs
  *(.glue_7t)
- .glue_7t       0x0000000008001e68        0x0 linker stubs
+ .glue_7t       0x0000000008001fec        0x0 linker stubs
  *(.eh_frame)
- .eh_frame      0x0000000008001e68        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtbegin.o
+ .eh_frame      0x0000000008001fec        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtbegin.o
  *(.init)
- .init          0x0000000008001e68        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crti.o
-                0x0000000008001e68                _init
- .init          0x0000000008001e6c        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtn.o
+ .init          0x0000000008001fec        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crti.o
+                0x0000000008001fec                _init
+ .init          0x0000000008001ff0        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtn.o
  *(.fini)
- .fini          0x0000000008001e74        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crti.o
-                0x0000000008001e74                _fini
- .fini          0x0000000008001e78        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtn.o
-                0x0000000008001e80                . = ALIGN (0x4)
-                0x0000000008001e80                _etext = .
+ .fini          0x0000000008001ff8        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crti.o
+                0x0000000008001ff8                _fini
+ .fini          0x0000000008001ffc        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtn.o
+                0x0000000008002004                . = ALIGN (0x4)
+                0x0000000008002004                _etext = .
 
-.vfp11_veneer   0x0000000008001e80        0x0
- .vfp11_veneer  0x0000000008001e80        0x0 linker stubs
+.vfp11_veneer   0x0000000008002004        0x0
+ .vfp11_veneer  0x0000000008002004        0x0 linker stubs
 
-.v4_bx          0x0000000008001e80        0x0
- .v4_bx         0x0000000008001e80        0x0 linker stubs
+.v4_bx          0x0000000008002004        0x0
+ .v4_bx         0x0000000008002004        0x0 linker stubs
 
-.iplt           0x0000000008001e80        0x0
- .iplt          0x0000000008001e80        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtbegin.o
+.iplt           0x0000000008002004        0x0
+ .iplt          0x0000000008002004        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtbegin.o
 
-.rodata         0x0000000008001e80       0x14
-                0x0000000008001e80                . = ALIGN (0x4)
+.rodata         0x0000000008002004       0x14
+                0x0000000008002004                . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x0000000008001e80        0x3 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+ .rodata        0x0000000008002004        0x3 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  *(.rodata*)
- *fill*         0x0000000008001e83        0x1 
+ *fill*         0x0000000008002007        0x1 
  .rodata.AHBPrescTable
-                0x0000000008001e84       0x10 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
-                0x0000000008001e84                AHBPrescTable
-                0x0000000008001e94                . = ALIGN (0x4)
+                0x0000000008002008       0x10 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
+                0x0000000008002008                AHBPrescTable
+                0x0000000008002018                . = ALIGN (0x4)
 
-.ARM.extab      0x0000000008001e94        0xc
+.ARM.extab      0x0000000008002018       0x30
  *(.ARM.extab* .gnu.linkonce.armextab.*)
+ .ARM.extab.text._ZN5Clock22configure_clock_sourceE10Clock_INRQ
+                0x0000000008002018        0xc CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+ .ARM.extab.text._ZN5Clock8__init__E10Clock_INRQ
+                0x0000000008002024        0xc CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+ .ARM.extab.text._ZN3LED21led_timeout_exceptionEv
+                0x0000000008002030        0xc CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
  .ARM.extab.text.__NVIC_EnableIRQ
-                0x0000000008001e94        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800203c        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.extab.text._ZN3CAN17configure_gpio_rxEv
-                0x0000000008001e94        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800203c        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.extab.text._ZN3CAN17configure_gpio_txEv
-                0x0000000008001e94        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800203c        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.extab.text._ZN3CAN14configure_gpioEv
-                0x0000000008001e94        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800203c        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.extab.text._ZN3CAN17configure_timingsE19CAN_bit_timing_INRQ
-                0x0000000008001e94        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800203c        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.extab.text._ZN3CAN22configure_tx_mailboxesE11CAN_Tx_INRQ
-                0x0000000008001e94        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800203c        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.extab.text._ZN3CAN19configure_recievingE11CAN_Rx_INRQ
-                0x0000000008001e94        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800203c        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.extab.text._ZN3CAN16configure_filterE15CAN_filter_INRQ
-                0x0000000008001e94        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800203c        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.extab.text._ZN3CAN20configure_interruptsEv
-                0x0000000008001e94        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800203c        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.extab.text._ZN3CAN8can_INRQE8CAN_INRQ
-                0x0000000008001e94        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800203c        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.extab.text._ZN3CANC2Ev
-                0x0000000008001e94        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800203c        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.extab.text._ZN3CAN8__init__E8CAN_INRQ
-                0x0000000008001e94        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800203c        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.extab.text._ZN3CAN8transmitEPhh11CAN_Tx_INRQ
-                0x0000000008001e94        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800203c        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.extab.text._ZN3CAN7recieveE11CAN_Rx_INRQ
-                0x0000000008001e94        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800203c        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.extab.text.USB_LP_CAN1_RX0_IRQHandler
-                0x0000000008001e94        0xc CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x000000000800203c        0xc CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
 
-.ARM            0x0000000008001ea0       0xa0
-                0x0000000008001ea0                __exidx_start = .
+.ARM            0x0000000008002048       0xc8
+                0x0000000008002048                __exidx_start = .
  *(.ARM.exidx*)
- .ARM.exidx.text._ZN5Clock8__init__Ev
-                0x0000000008001ea0        0x8 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
- .ARM.exidx.text._ZN5Delay8__init__Ev
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
+ .ARM.exidx.text._ZN5Clock20configure_APB1_clockE24Clock_configuration_INRQ
+                0x0000000008002048        0x8 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+ .ARM.exidx.text._ZN5Clock20configure_APB2_clockE24Clock_configuration_INRQ
+                0x0000000008002050        0x0 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
                                           0x8 (size before relaxing)
+ .ARM.exidx.text._ZN5Clock22configure_clock_sourceE10Clock_INRQ
+                0x0000000008002050        0x8 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+ .ARM.exidx.text._ZN5Clock8__init__E10Clock_INRQ
+                0x0000000008002058        0x8 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+ .ARM.exidx.text._ZN5Delay8__init__Ev
+                0x0000000008002060        0x8 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
  .ARM.exidx.text._ZN5Delay4waitEm
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
+                0x0000000008002068        0x0 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
+                                          0x8 (size before relaxing)
+ .ARM.exidx.text._ZN5Delay7timeoutERVmmm
+                0x0000000008002068        0x0 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3LED8__init__Ev
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+                0x0000000008002068        0x0 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3LED6led_onEv
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+                0x0000000008002068        0x0 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3LED7led_offEv
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+                0x0000000008002068        0x0 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3LED10led_toggleEv
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+                0x0000000008002068        0x0 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
                                           0x8 (size before relaxing)
+ .ARM.exidx.text._ZN3LED21led_timeout_exceptionEv
+                0x0000000008002068        0x8 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
  .ARM.exidx.text.__NVIC_EnableIRQ
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                                          0x8 (size before relaxing)
+                0x0000000008002070        0x8 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.exidx.text._ZN3CAN17configure_gpio_rxEv
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008002078        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3CAN17configure_gpio_txEv
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008002078        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3CAN14configure_gpioEv
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008002078        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3CAN17configure_timingsE19CAN_bit_timing_INRQ
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008002078        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3CAN22configure_tx_mailboxesE11CAN_Tx_INRQ
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008002078        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3CAN19configure_recievingE11CAN_Rx_INRQ
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008002078        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3CAN16configure_filterE15CAN_filter_INRQ
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008002078        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3CAN20configure_interruptsEv
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008002078        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3CAN8can_INRQE8CAN_INRQ
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008002078        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3CANC2Ev
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008002078        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3CAN8__init__E8CAN_INRQ
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008002078        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3CAN8transmitEPhh11CAN_Tx_INRQ
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008002078        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text._ZN3CAN7recieveE11CAN_Rx_INRQ
-                0x0000000008001ea8        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008002078        0x0 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text.USB_LP_CAN1_RX0_IRQHandler
-                0x0000000008001ea8        0x8 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008002078        0x8 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .ARM.exidx.text.main
-                0x0000000008001eb0       0x10 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000008002080       0x10 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
                                           0x8 (size before relaxing)
  .ARM.exidx.text.selfrel_offset31
-                0x0000000008001ec0        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x0000000008002090        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
                                           0x8 (size before relaxing)
  .ARM.exidx.text.search_EIT_table
-                0x0000000008001ec0        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x0000000008002090        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
                                           0x8 (size before relaxing)
  .ARM.exidx.text.__gnu_unwind_get_pr_addr
-                0x0000000008001ec0        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x0000000008002090        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
                                           0x8 (size before relaxing)
  .ARM.exidx.text.get_eit_entry
-                0x0000000008001ec0        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x0000000008002090        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .ARM.exidx.text.restore_non_core_regs
-                0x0000000008001ec8        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x0000000008002098        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .ARM.exidx.text._Unwind_decode_typeinfo_ptr.constprop.0
-                0x0000000008001ed0        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020a0        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .ARM.exidx.text._Unwind_DebugHook
-                0x0000000008001ed8        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020a8        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
                                           0x8 (size before relaxing)
  .ARM.exidx.text.unwind_phase2
-                0x0000000008001ed8        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020a8        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .ARM.exidx.text.unwind_phase2_forced
-                0x0000000008001ee0        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020b0        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .ARM.exidx.text.__gnu_Unwind_RaiseException
-                0x0000000008001ee8        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020b8        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .ARM.exidx.text.__gnu_Unwind_ForcedUnwind
-                0x0000000008001ef0        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020c0        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .ARM.exidx.text.__gnu_Unwind_Resume
-                0x0000000008001ef8        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020c8        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .ARM.exidx.text.__gnu_Unwind_Resume_or_Rethrow
-                0x0000000008001f00        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020d0        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .ARM.exidx.text._Unwind_VRS_Get
-                0x0000000008001f08        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020d8        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
                                           0x8 (size before relaxing)
  .ARM.exidx.text._Unwind_GetGR
-                0x0000000008001f08        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020d8        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
                                           0x8 (size before relaxing)
  .ARM.exidx.text._Unwind_VRS_Set
-                0x0000000008001f08        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020d8        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
                                           0x8 (size before relaxing)
  .ARM.exidx.text._Unwind_SetGR
-                0x0000000008001f08        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020d8        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
                                           0x8 (size before relaxing)
  .ARM.exidx.text.__gnu_Unwind_Backtrace
-                0x0000000008001f08        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020d8        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .ARM.exidx.text.__gnu_unwind_pr_common
-                0x0000000008001f10        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020e0        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .ARM.exidx.text.__aeabi_unwind_cpp_pr0
-                0x0000000008001f18        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020e8        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .ARM.exidx.text.__aeabi_unwind_cpp_pr1
-                0x0000000008001f20        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020f0        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
                                           0x8 (size before relaxing)
  .ARM.exidx.text.__aeabi_unwind_cpp_pr2
-                0x0000000008001f20        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020f0        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
                                           0x8 (size before relaxing)
  .ARM.exidx.text._Unwind_VRS_Pop
-                0x0000000008001f20        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+                0x00000000080020f0        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
  .ARM.exidx.text.next_unwind_byte
-                0x0000000008001f28        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(pr-support.o)
+                0x00000000080020f8        0x8 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(pr-support.o)
  .ARM.exidx.text.__gnu_unwind_execute
-                0x0000000008001f30       0x10 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(pr-support.o)
+                0x0000000008002100       0x10 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(pr-support.o)
                                           0x8 (size before relaxing)
-                0x0000000008001f40                __exidx_end = .
+                0x0000000008002110                __exidx_end = .
 
-.rel.dyn        0x0000000008001f40        0x0
- .rel.iplt      0x0000000008001f40        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtbegin.o
+.rel.dyn        0x0000000008002110        0x0
+ .rel.iplt      0x0000000008002110        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtbegin.o
 
-.preinit_array  0x0000000008001f40        0x0
-                0x0000000008001f40                PROVIDE (__preinit_array_start = .)
+.preinit_array  0x0000000008002110        0x0
+                0x0000000008002110                PROVIDE (__preinit_array_start = .)
  *(.preinit_array*)
-                0x0000000008001f40                PROVIDE (__preinit_array_end = .)
+                0x0000000008002110                PROVIDE (__preinit_array_end = .)
 
-.init_array     0x0000000008001f40        0x8
-                0x0000000008001f40                PROVIDE (__init_array_start = .)
+.init_array     0x0000000008002110        0x8
+                0x0000000008002110                PROVIDE (__init_array_start = .)
  *(SORT_BY_NAME(.init_array.*))
  .init_array.00000
-                0x0000000008001f40        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__call_atexit.o)
+                0x0000000008002110        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__call_atexit.o)
  *(.init_array*)
- .init_array    0x0000000008001f44        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtbegin.o
-                0x0000000008001f48                PROVIDE (__init_array_end = .)
+ .init_array    0x0000000008002114        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtbegin.o
+                0x0000000008002118                PROVIDE (__init_array_end = .)
 
-.fini_array     0x0000000008001f48        0x4
-                0x0000000008001f48                PROVIDE (__fini_array_start = .)
+.fini_array     0x0000000008002118        0x4
+                0x0000000008002118                PROVIDE (__fini_array_start = .)
  *(SORT_BY_NAME(.fini_array.*))
  *(.fini_array*)
- .fini_array    0x0000000008001f48        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtbegin.o
-                0x0000000008001f4c                PROVIDE (__fini_array_end = .)
-                0x0000000008001f4c                _sidata = LOADADDR (.data)
+ .fini_array    0x0000000008002118        0x4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtbegin.o
+                0x000000000800211c                PROVIDE (__fini_array_end = .)
+                0x000000000800211c                _sidata = LOADADDR (.data)
 
-.data           0x0000000020000000        0xc load address 0x0000000008001f4c
+.data           0x0000000020000000        0xc load address 0x000000000800211c
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                _sdata = .
  *(.data)
@@ -1729,17 +1775,17 @@ LOAD /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtn.o
                 0x000000002000000c                _edata = .
 
 .tm_clone_table
-                0x000000002000000c        0x0 load address 0x0000000008001f58
+                0x000000002000000c        0x0 load address 0x0000000008002128
  .tm_clone_table
                 0x000000002000000c        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtbegin.o
  .tm_clone_table
                 0x000000002000000c        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtend.o
 
-.igot.plt       0x000000002000000c        0x0 load address 0x0000000008001f58
+.igot.plt       0x000000002000000c        0x0 load address 0x0000000008002128
  .igot.plt      0x000000002000000c        0x0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtbegin.o
                 0x000000002000000c                . = ALIGN (0x4)
 
-.bss            0x000000002000000c      0x1dc load address 0x0000000008001f58
+.bss            0x000000002000000c      0x1dc load address 0x0000000008002128
                 0x000000002000000c                _sbss = .
                 0x000000002000000c                __bss_start__ = _sbss
  *(.bss)
@@ -1768,7 +1814,7 @@ LOAD /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/crtn.o
                 0x00000000200001e8                __bss_end__ = _ebss
 
 ._user_heap_stack
-                0x00000000200001e8      0x600 load address 0x0000000008001f58
+                0x00000000200001e8      0x600 load address 0x0000000008002128
                 0x00000000200001e8                . = ALIGN (0x8)
                 0x00000000200001e8                PROVIDE (end = .)
                 [!provide]                        PROVIDE (_end = .)
@@ -1836,89 +1882,89 @@ LOAD /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thum
 LOAD /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libm.a
 LOAD /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a
 
-.debug_info     0x0000000000000000     0x27db
- .debug_info    0x0000000000000000      0x1ae CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
- .debug_info    0x00000000000001ae      0x303 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
- .debug_info    0x00000000000004b1      0x28f CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
- .debug_info    0x0000000000000740     0x1647 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
- .debug_info    0x0000000000001d87      0x10f CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
- .debug_info    0x0000000000001e96      0x217 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
- .debug_info    0x00000000000020ad      0x700 CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
- .debug_info    0x00000000000027ad       0x2e CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
+.debug_info     0x0000000000000000     0x2e43
+ .debug_info    0x0000000000000000      0x4ad CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+ .debug_info    0x00000000000004ad      0x3af CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
+ .debug_info    0x000000000000085c      0x363 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+ .debug_info    0x0000000000000bbf     0x1830 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+ .debug_info    0x00000000000023ef      0x10f CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+ .debug_info    0x00000000000024fe      0x217 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
+ .debug_info    0x0000000000002715      0x700 CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
+ .debug_info    0x0000000000002e15       0x2e CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
 
-.debug_abbrev   0x0000000000000000      0xbb2
- .debug_abbrev  0x0000000000000000      0x10e CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
- .debug_abbrev  0x000000000000010e      0x150 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
- .debug_abbrev  0x000000000000025e      0x126 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
- .debug_abbrev  0x0000000000000384      0x464 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
- .debug_abbrev  0x00000000000007e8       0x71 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
- .debug_abbrev  0x0000000000000859      0x13d CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
- .debug_abbrev  0x0000000000000996      0x1ff CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
- .debug_abbrev  0x0000000000000b95       0x1d CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
+.debug_abbrev   0x0000000000000000      0xd7a
+ .debug_abbrev  0x0000000000000000      0x1ff CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+ .debug_abbrev  0x00000000000001ff      0x18d CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
+ .debug_abbrev  0x000000000000038c      0x179 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+ .debug_abbrev  0x0000000000000505      0x4ab CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+ .debug_abbrev  0x00000000000009b0       0x71 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+ .debug_abbrev  0x0000000000000a21      0x13d CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
+ .debug_abbrev  0x0000000000000b5e      0x1ff CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
+ .debug_abbrev  0x0000000000000d5d       0x1d CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
 
-.debug_aranges  0x0000000000000000      0x2a8
+.debug_aranges  0x0000000000000000      0x2d0
  .debug_aranges
-                0x0000000000000000       0x20 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+                0x0000000000000000       0x38 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
  .debug_aranges
-                0x0000000000000020       0x28 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
+                0x0000000000000038       0x30 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
  .debug_aranges
-                0x0000000000000048       0x38 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+                0x0000000000000068       0x40 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
  .debug_aranges
-                0x0000000000000080       0x98 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x00000000000000a8       0x98 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .debug_aranges
-                0x0000000000000118       0x60 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+                0x0000000000000140       0x60 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
  .debug_aranges
-                0x0000000000000178       0x28 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
+                0x00000000000001a0       0x28 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
  .debug_aranges
-                0x00000000000001a0       0xe0 CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
+                0x00000000000001c8       0xe0 CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
  .debug_aranges
-                0x0000000000000280       0x28 CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
+                0x00000000000002a8       0x28 CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
 
 .debug_rnglists
-                0x0000000000000000      0x1f9
+                0x0000000000000000      0x1fd
  .debug_rnglists
-                0x0000000000000000       0x2e CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+                0x0000000000000000       0x26 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
  .debug_rnglists
-                0x000000000000002e       0x19 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
+                0x0000000000000026       0x1f CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
  .debug_rnglists
-                0x0000000000000047       0x25 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+                0x0000000000000045       0x2b CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
  .debug_rnglists
-                0x000000000000006c       0x74 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                0x0000000000000070       0x74 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
  .debug_rnglists
-                0x00000000000000e0       0x43 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+                0x00000000000000e4       0x43 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
  .debug_rnglists
-                0x0000000000000123       0x1a CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
+                0x0000000000000127       0x1a CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
  .debug_rnglists
-                0x000000000000013d       0xa3 CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
+                0x0000000000000141       0xa3 CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
  .debug_rnglists
-                0x00000000000001e0       0x19 CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
+                0x00000000000001e4       0x19 CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
 
-.debug_line     0x0000000000000000     0x148d
- .debug_line    0x0000000000000000      0x177 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
- .debug_line    0x0000000000000177      0x18f CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
- .debug_line    0x0000000000000306      0x189 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
- .debug_line    0x000000000000048f      0x7db CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
- .debug_line    0x0000000000000c6a      0x15c CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
- .debug_line    0x0000000000000dc6      0x1c3 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
- .debug_line    0x0000000000000f89      0x48c CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
- .debug_line    0x0000000000001415       0x78 CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
+.debug_line     0x0000000000000000     0x15c7
+ .debug_line    0x0000000000000000      0x21a CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+ .debug_line    0x000000000000021a      0x1cd CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
+ .debug_line    0x00000000000003e7      0x1ba CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+ .debug_line    0x00000000000005a1      0x803 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+ .debug_line    0x0000000000000da4      0x15c CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+ .debug_line    0x0000000000000f00      0x1c3 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
+ .debug_line    0x00000000000010c3      0x48c CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
+ .debug_line    0x000000000000154f       0x78 CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
 
-.debug_str      0x0000000000000000     0x1299
- .debug_str     0x0000000000000000      0x188 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
-                                        0x1df (size before relaxing)
- .debug_str     0x0000000000000188       0xa1 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
-                                        0x24a (size before relaxing)
- .debug_str     0x0000000000000229       0xa1 CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
-                                        0x23c (size before relaxing)
- .debug_str     0x00000000000002ca      0xa6d CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
-                                        0xe5f (size before relaxing)
- .debug_str     0x0000000000000d37      0x14b CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+.debug_str      0x0000000000000000     0x14b9
+ .debug_str     0x0000000000000000      0x43f CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+                                        0x51a (size before relaxing)
+ .debug_str     0x000000000000043f       0x81 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
+                                        0x287 (size before relaxing)
+ .debug_str     0x00000000000004c0       0x3b CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+                                        0x2d6 (size before relaxing)
+ .debug_str     0x00000000000004fb      0xa63 CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+                                       0x1102 (size before relaxing)
+ .debug_str     0x0000000000000f5e      0x14b CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
                                         0x1ec (size before relaxing)
- .debug_str     0x0000000000000e82       0x66 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
+ .debug_str     0x00000000000010a9       0x66 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
                                         0x212 (size before relaxing)
- .debug_str     0x0000000000000ee8      0x36e CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
+ .debug_str     0x000000000000110f      0x367 CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
                                         0x7f8 (size before relaxing)
- .debug_str     0x0000000000001256       0x43 CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
+ .debug_str     0x0000000000001476       0x43 CMakeFiles/can.elf.dir/startup_stm32f103xb.s.obj
                                          0x54 (size before relaxing)
 
 .comment        0x0000000000000000       0x45
@@ -1931,22 +1977,22 @@ LOAD /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a
  .comment       0x0000000000000045       0x46 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
  .comment       0x0000000000000045       0x46 CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
 
-.debug_frame    0x0000000000000000      0xdf4
- .debug_frame   0x0000000000000000       0x38 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
- .debug_frame   0x0000000000000038       0x60 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
- .debug_frame   0x0000000000000098       0xac CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
- .debug_frame   0x0000000000000144      0x29c CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
- .debug_frame   0x00000000000003e0      0x104 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
- .debug_frame   0x00000000000004e4       0x58 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
- .debug_frame   0x000000000000053c      0x334 CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
- .debug_frame   0x0000000000000870      0x2d0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
- .debug_frame   0x0000000000000b40       0xf4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(pr-support.o)
- .debug_frame   0x0000000000000c34       0x5c /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__call_atexit.o)
- .debug_frame   0x0000000000000c90       0x2c /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-init.o)
- .debug_frame   0x0000000000000cbc       0x34 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fini.o)
- .debug_frame   0x0000000000000cf0       0xb0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lock.o)
- .debug_frame   0x0000000000000da0       0x20 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-atexit.o)
- .debug_frame   0x0000000000000dc0       0x34 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__atexit.o)
+.debug_frame    0x0000000000000000      0xeac
+ .debug_frame   0x0000000000000000       0xa8 CMakeFiles/can.elf.dir/Core/Src/Clock.cpp.obj
+ .debug_frame   0x00000000000000a8       0x88 CMakeFiles/can.elf.dir/Core/Src/Delay.cpp.obj
+ .debug_frame   0x0000000000000130       0xcc CMakeFiles/can.elf.dir/Core/Src/LED.cpp.obj
+ .debug_frame   0x00000000000001fc      0x29c CMakeFiles/can.elf.dir/Core/Src/main.cpp.obj
+ .debug_frame   0x0000000000000498      0x104 CMakeFiles/can.elf.dir/Core/Src/stm32f1xx_it.c.obj
+ .debug_frame   0x000000000000059c       0x58 CMakeFiles/can.elf.dir/Core/Src/system_stm32f1xx.c.obj
+ .debug_frame   0x00000000000005f4      0x334 CMakeFiles/can.elf.dir/Drivers/STM32F1xx_HAL_Driver/Src/stm32f1xx_hal.c.obj
+ .debug_frame   0x0000000000000928      0x2d0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(unwind-arm.o)
+ .debug_frame   0x0000000000000bf8       0xf4 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/libgcc.a(pr-support.o)
+ .debug_frame   0x0000000000000cec       0x5c /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__call_atexit.o)
+ .debug_frame   0x0000000000000d48       0x2c /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-init.o)
+ .debug_frame   0x0000000000000d74       0x34 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-fini.o)
+ .debug_frame   0x0000000000000da8       0xb0 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-lock.o)
+ .debug_frame   0x0000000000000e58       0x20 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-atexit.o)
+ .debug_frame   0x0000000000000e78       0x34 /usr/bin/../lib/gcc/arm-none-eabi/12.2.1/../../../../arm-none-eabi/lib/thumb/v7-m/nofp/libc.a(libc_a-__atexit.o)
 
 .debug_line_str
                 0x0000000000000000      0x1c1

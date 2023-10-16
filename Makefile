@@ -201,6 +201,30 @@ Core/Src/LED.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/can.elf.dir/build.make CMakeFiles/can.elf.dir/Core/Src/LED.cpp.s
 .PHONY : Core/Src/LED.cpp.s
 
+Core/Src/UART.obj: Core/Src/UART.cpp.obj
+.PHONY : Core/Src/UART.obj
+
+# target to build an object file
+Core/Src/UART.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/can.elf.dir/build.make CMakeFiles/can.elf.dir/Core/Src/UART.cpp.obj
+.PHONY : Core/Src/UART.cpp.obj
+
+Core/Src/UART.i: Core/Src/UART.cpp.i
+.PHONY : Core/Src/UART.i
+
+# target to preprocess a source file
+Core/Src/UART.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/can.elf.dir/build.make CMakeFiles/can.elf.dir/Core/Src/UART.cpp.i
+.PHONY : Core/Src/UART.cpp.i
+
+Core/Src/UART.s: Core/Src/UART.cpp.s
+.PHONY : Core/Src/UART.s
+
+# target to generate assembly for a file
+Core/Src/UART.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/can.elf.dir/build.make CMakeFiles/can.elf.dir/Core/Src/UART.cpp.s
+.PHONY : Core/Src/UART.cpp.s
+
 Core/Src/main.obj: Core/Src/main.cpp.obj
 .PHONY : Core/Src/main.obj
 
@@ -635,6 +659,9 @@ help:
 	@echo "... Core/Src/LED.obj"
 	@echo "... Core/Src/LED.i"
 	@echo "... Core/Src/LED.s"
+	@echo "... Core/Src/UART.obj"
+	@echo "... Core/Src/UART.i"
+	@echo "... Core/Src/UART.s"
 	@echo "... Core/Src/main.obj"
 	@echo "... Core/Src/main.i"
 	@echo "... Core/Src/main.s"

@@ -14,3 +14,12 @@ void Delay::wait(uint32_t ms) {
     }
   }
 }
+
+uint8_t Delay::timeout(volatile uint32_t &reg, const uint32_t comparable, volatile uint32_t timeout) {
+  for (uint32_t i = 0; i < timeout; i++) {
+    if (reg & comparable) {
+      return 0;
+    } 
+  }
+  return 1;
+}

@@ -7,6 +7,7 @@
 #include "Clock.h"
 #include "LED.h"
 #include <time.h>
+#include "Clock_INRQ.h"
 
 class CAN {
 private:
@@ -212,8 +213,23 @@ extern "C" void CAN1_RX0_IRQHandler(void) {
 }
 
 int main() {
+  
+  Clock_INRQ clock_header;
+  clock_header.clock_control_INRQ.enable_HSE = 0;
+  clock_header.clock_control_INRQ.enable_HSI = 1;
+  clock_header.clock_control_INRQ.enable_PLL = 1;
+  clock_header.clock_control_INRQ.enbale_CSS = 0;
+  clock_header.clock_control_INRQ.enalbe_HSEBYP = 0;
+
+  clock_header.clock_configuration_INRQ.clock_source = Clock_system_source_selector::PLL;
+  clock_header.clock_configuration_INRQ.PLL_multiplier = 0b0111; // 9 
+  clock_header.clock_configuration_INRQ.PLL_enable_HSE = 0;
+  clock_header.clock_configuration_INRQ.PLL_prescaler = 0;
+  clock_header.clock_configuration_INRQ.APB1_prescaler = 0;
+  clock_header.clock_configuration_INRQ.APB2_prescaler = 0;
+
   Clock clock;
-  clock.__init__();
+  clock.__init__(clock_header);
 
   Delay().__init__();
 
