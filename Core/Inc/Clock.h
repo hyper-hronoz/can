@@ -11,6 +11,7 @@ private:
   void configure_clock_source(Clock_INRQ header);
 public:
   void __init__(Clock_INRQ header);
+  void reset_clock();
 };
 
 #endif

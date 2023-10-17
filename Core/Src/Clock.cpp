@@ -13,6 +13,7 @@ void Clock::configure_clock_source(Clock_INRQ header) {
   RCC->CR |= RCC_CR_HSION;
 
   if (Delay().timeout(RCC->CR, RCC_CR_HSIRDY, 255)) {
+    this->reset_clock();
     LED().led_timeout_exception();
   }
 
@@ -32,9 +33,24 @@ void Clock::configure_clock_source(Clock_INRQ header) {
     RCC->CR |= RCC_CR_PLLON;
 
     if (Delay().timeout(RCC->CR, RCC_CR_PLLRDY, 255)) {
+      this->reset_clock();
       LED().led_timeout_exception();
     }
   }
+}
+
+void Clock::reset_clock() {
+  RCC->CR |= RCC_CR_HSION;
+
+  if (Delay().timeout(RCC->CR, RCC_CR_HSIRDY, 255)) {
+    LED().led_timeout_exception();
+  }
+
+  RCC->CR &= ~(RCC_CR_PLLON);
+  RCC->CR &= ~(RCC_CR_HSION);
+
+  RCC->CFGR &= ~(RCC_CFGR_SW_Msk);
+  RCC->CFGR |= RCC_CFGR_SW_HSI;
 }
 
 void Clock::__init__(Clock_INRQ header) {

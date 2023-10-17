@@ -5,7 +5,7 @@
 
 class Delay {
 public:
-  void __init__();
+  void __init__(uint8_t prescaler);
 
   void wait(uint32_t ms);
 

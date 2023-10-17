@@ -208,11 +208,13 @@ public:
 
 CAN_INRQ inrq_config;
 extern "C" void CAN1_RX0_IRQHandler(void) {
-  CAN().recieve(inrq_config.can_rx);
   LED().led_toggle();
+  CAN().recieve(inrq_config.can_rx);
 }
 
 int main() {
+  Delay().__init__(8);
+  LED().__init__();
   
   Clock_INRQ clock_header;
   clock_header.clock_control_INRQ.enable_HSE = 0;
@@ -231,11 +233,9 @@ int main() {
   Clock clock;
   clock.__init__(clock_header);
 
-  Delay().__init__();
+  Delay().__init__(36);
 
-  LED led;
-  led.__init__();
-  led.led_on();
+  LED().led_off();
 
   SystemCoreClockUpdate();
   __IO uint32_t clock_value = SystemCoreClock;
@@ -267,8 +267,7 @@ int main() {
   can.__init__(inrq_config);
 
   uint8_t temp = 0;
-  uint8_t data[] =
-      "hi";
+  uint8_t data[] = "hunter x hunter";
 
   volatile uint16_t counter = 0;
 
@@ -277,7 +276,6 @@ int main() {
   while (1) {
     can.transmit(data, sizeof(data), inrq_config.can_tx);
     Delay().wait(200);
-    LED().led_toggle();
   }
 
   return 0;
