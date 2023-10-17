@@ -209,11 +209,17 @@ public:
   }
 };
 
+extern "C" void USART1_IRQHandler(void) {
+  char rxd = USART1->DR;
+  LED().led_toggle();
+}
+
 CAN_INRQ inrq_config;
 extern "C" void CAN1_RX0_IRQHandler(void) {
   LED().led_toggle();
   CAN().recieve(inrq_config.can_rx);
 }
+
 
 int main() {
   Delay().__init__(8);
@@ -289,10 +295,10 @@ int main() {
   // 125	0.0000	18	16	13	2	87.5	 0x001c0011
 
   while (1) {
-    can.transmit(data, sizeof(data), inrq_config.can_tx);
-    Delay().wait(200);
+    // can.transmit(data, sizeof(data), inrq_config.can_tx);
+    // Delay().wait(200);
     uart.transmit(data, sizeof(data));
-    Delay().wait(200);
+    Delay().wait(500);
   }
 
   return 0;

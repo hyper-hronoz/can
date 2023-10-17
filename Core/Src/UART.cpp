@@ -18,13 +18,15 @@ void UART::configure_GPIO_transmit() {
 
 void UART::transmit(uint8_t *data, uint32_t size) {
   for (uint32_t i = 0; i < size; i++) {
-    if (Delay().timeout(USART1->SR, USART_SR_TXE, 10000)) { //  transmission empty
+    if (Delay().timeout(USART1->SR, USART_SR_TXE,
+                        10000)) { //  transmission empty
       LED().led_timeout_exception();
     }
 
     USART1->DR = data[i];
 
-    if (Delay().timeout(USART1->SR, USART_SR_TC, 10000)) {
+    if (Delay().timeout(USART1->SR, USART_SR_TC,
+                        10000)) { // transmission complited
       LED().led_timeout_exception();
     }
   }
@@ -45,12 +47,14 @@ void UART::configure_UART(UART_INRQ header) {
   USART1->CR1 |= (header.enable_transmitter << USART_CR1_TE_Pos);
 
   USART1->CR1 &= ~(USART_CR1_RE_Msk);
-  USART1->CR1 |= (header.enable_reciever << USART_CR1_TE_Pos);
+  USART1->CR1 |= (header.enable_reciever << USART_CR1_RE_Pos);
 
+  USART1->CR1 |= USART_CR1_RXNEIE;
+  NVIC_EnableIRQ (USART1_IRQn);
 }
 
 void UART::__init__(UART_INRQ header) {
-  RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;;
+  RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
   RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
 
   this->configure_GPIO_recieve();
