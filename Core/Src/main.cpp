@@ -1,13 +1,15 @@
 #include "CAN_INRQ.h"
+#include "Clock.h"
+#include "Clock_INRQ.h"
+#include "Delay.h"
+#include "LED.h"
+#include "UART.h"
 #include "stm32f103xb.h"
 #include "stm32f1xx.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "Delay.h"
-#include "Clock.h"
-#include "LED.h"
 #include <time.h>
-#include "Clock_INRQ.h"
+
 
 class CAN {
 private:
@@ -15,7 +17,7 @@ private:
     // GPIOA->CRH &= ~(GPIO_CRH_MODE11_Msk);
     // GPIOA->CRH &= ~(GPIO_CRH_CNF11_Msk);
     // GPIOA->CRH |= GPIO_CRH_CNF11_1;
-    
+
     GPIOA->CRH &= ~GPIO_CRH_CNF11;
     GPIOA->CRH |= GPIO_CRH_CNF11_1;
     GPIOA->CRH |= GPIO_CRH_MODE11;
@@ -69,7 +71,8 @@ private:
 
     // remove transmission request
     CAN1->sFIFOMailBox[0].RIR &= ~(CAN_RI1R_RTR_Msk); // data frame
-    CAN1->sFIFOMailBox[0].RIR |= (header.remote_transmission_req << CAN_RI1R_RTR_Pos); // data frame
+    CAN1->sFIFOMailBox[0].RIR |=
+        (header.remote_transmission_req << CAN_RI1R_RTR_Pos); // data frame
 
     // configuring filter for mailbox ex: 0 - index of filter
     CAN1->sFIFOMailBox[0].RDTR &= ~(CAN_RDT0R_FMI_Msk);
@@ -215,7 +218,7 @@ extern "C" void CAN1_RX0_IRQHandler(void) {
 int main() {
   Delay().__init__(8);
   LED().__init__();
-  
+
   Clock_INRQ clock_header;
   clock_header.clock_control_INRQ.enable_HSE = 0;
   clock_header.clock_control_INRQ.enable_HSI = 1;
@@ -223,8 +226,9 @@ int main() {
   clock_header.clock_control_INRQ.enbale_CSS = 0;
   clock_header.clock_control_INRQ.enalbe_HSEBYP = 0;
 
-  clock_header.clock_configuration_INRQ.clock_source = Clock_system_source_selector::PLL;
-  clock_header.clock_configuration_INRQ.PLL_multiplier = 0b0111; // 9 
+  clock_header.clock_configuration_INRQ.clock_source =
+      Clock_system_source_selector::PLL;
+  clock_header.clock_configuration_INRQ.PLL_multiplier = 0b0111; // 9
   clock_header.clock_configuration_INRQ.PLL_enable_HSE = 0;
   clock_header.clock_configuration_INRQ.PLL_prescaler = 0;
   clock_header.clock_configuration_INRQ.APB1_prescaler = 0;
@@ -266,6 +270,17 @@ int main() {
   CAN can;
   can.__init__(inrq_config);
 
+  UART_INRQ UART_header;
+
+  UART_header.baudrate = 	3750;
+  UART_header.enable_transmitter = 1;
+  UART_header.enable_reciever = 1;
+  UART_header.enable_word_9bit = 0;
+  UART_header.enable_parity = 0;
+
+  UART uart;
+  uart.__init__(UART_header);
+
   uint8_t temp = 0;
   uint8_t data[] = "hunter x hunter";
 
@@ -275,6 +290,8 @@ int main() {
 
   while (1) {
     can.transmit(data, sizeof(data), inrq_config.can_tx);
+    Delay().wait(200);
+    uart.transmit(data, sizeof(data));
     Delay().wait(200);
   }
 

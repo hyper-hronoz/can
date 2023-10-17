@@ -2,41 +2,23 @@
 #define __UART__
 
 #include "stm32f1xx.h"
+#include "UART_INRQ.h"
+#include "Delay.h"
 
 class UART {
   private:
-    void configure_GPIO_recieve() {
-      GPIOB->CRL &= ~(GPIO_CRL_MODE7_Msk);
-      GPIOB->CRL |= GPIO_CRL_MODE7;
-      GPIOB->CRL &= ~(GPIO_CRL_CNF7_Msk);
-      GPIOB->CRL |= GPIO_CRL_CNF7_1;
-    }
+    void configure_GPIO_recieve();
 
-    void configure_GPIO_transmit() {
-      GPIOB->CRL &= ~(GPIO_CRL_MODE6_Msk);
-      GPIOB->CRL |= GPIO_CRL_MODE6;
-      GPIOB->CRL &= ~(GPIO_CRL_CNF6_Msk);
-      GPIOB->CRL |= GPIO_CRL_CNF6_1;
-    }
+    void configure_GPIO_transmit();
 
-    void configure_UART() {
-    }
+    void configure_UART(UART_INRQ header);
 
   public:
-    void __init__() {
-      RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
+    void __init__(UART_INRQ header);
 
-      this->configure_GPIO_recieve();
-      this->configure_GPIO_transmit();
-    }
+    void recieve();
 
-    void recieve() {
-
-    }
-
-    void transmit() {
-
-    }
+    void transmit(uint8_t *data, uint32_t size);
 };
 
 #endif

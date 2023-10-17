@@ -16,14 +16,13 @@ void LED::led_off() { GPIOC->ODR |= GPIO_ODR_ODR13; }
 void LED::led_toggle() { GPIOC->ODR ^= GPIO_ODR_ODR13; }
 
 void LED::led_timeout_exception() {
-  while(1) {
-    this->led_on();
-    Delay().wait(300);
-    this->led_off();
-    Delay().wait(300);
-    this->led_on();
-    Delay().wait(300);
-    this->led_off();
-    Delay().wait(1000);
-  }
+  this->led_on();
+  Delay().wait(300);
+  this->led_off();
+  Delay().wait(300);
+  this->led_on();
+  Delay().wait(300);
+  this->led_off();
+  Delay().wait(1000);
+  this->led_timeout_exception();
 }
