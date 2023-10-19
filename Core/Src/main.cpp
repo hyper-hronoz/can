@@ -11,6 +11,8 @@
 #include <time.h>
 
 
+
+
 class CAN {
 private:
   void configure_gpio_rx() {
@@ -208,7 +210,7 @@ public:
 
 extern "C" void USART1_IRQHandler(void) {
   char rxd = USART1->DR;
-  LED().led_toggle();
+  // LED().led_toggle();
 }
 
 CAN_INRQ inrq_config;
@@ -242,7 +244,7 @@ int main() {
 
   Delay().__init__(36);
 
-  LED().led_on();
+  LED().led_off();
 
   SystemCoreClockUpdate();
   __IO uint32_t clock_value = SystemCoreClock;

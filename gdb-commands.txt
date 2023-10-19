@@ -1,4 +1,4 @@
 opendocd -f interface/programmator -f board/target-board
-arm-none-eabi-gdb -q ./build/vape.elf
+arm-none-eabi-gdb -q ./build/can.elf
 target extended-remote:3333
 disass main

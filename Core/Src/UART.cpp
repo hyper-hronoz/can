@@ -3,10 +3,14 @@
 #include "LED.h"
 
 void UART::configure_GPIO_recieve() {
-  GPIOA->CRH &= ~(GPIO_CRH_MODE10_Msk);
-  GPIOA->CRH |= GPIO_CRH_MODE10;
-  GPIOA->CRH &= ~(GPIO_CRH_CNF10_Msk);
+  GPIOA->CRH &= ~(GPIO_CRH_CNF10_0);
   GPIOA->CRH |= GPIO_CRH_CNF10_1;
+  GPIOA->CRH &= ~(GPIO_CRH_MODE10);
+  GPIOA->ODR |= GPIO_ODR_ODR10;
+  // GPIOA->CRH &= ~(GPIO_CRH_MODE10_Msk);
+  // GPIOA->CRH |= GPIO_CRH_MODE10;
+  // GPIOA->CRH &= ~(GPIO_CRH_CNF10_Msk);
+  // GPIOA->CRH |= GPIO_CRH_CNF10_1;
 }
 
 void UART::configure_GPIO_transmit() {
