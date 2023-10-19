@@ -6,6 +6,9 @@
 #include "Delay.h"
 
 class UART {
+  public:
+    static uint8_t index;
+    static uint8_t buffer_fifo[8];
   private:
     void configure_GPIO_recieve();
 

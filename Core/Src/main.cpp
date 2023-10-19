@@ -11,7 +11,32 @@
 #include <time.h>
 
 
+struct Node_settings {
+  uint8_t self_node_id = 1;
+  uint8_t transmit_node_id = 2;
+};
 
+Node_settings node_settings;
+
+void strrev(uint8_t (&str)[8])
+{
+    // if the string is empty
+    if (!str) {
+        return;
+    }
+    // pointer to start and end at the string
+    uint32_t i = 0;
+    uint32_t j = sizeof(str) - 1;
+ 
+    // reversing string
+    while (i < j) {
+        uint8_t c = str[i];
+        str[i] = str[j];
+        str[j] = c;
+        i++;
+        j--;
+    }
+}
 
 class CAN {
 private:
@@ -189,7 +214,12 @@ public:
       return error_code;
   }
 
-  void recieve(CAN_Rx_INRQ header) {
+  void change_trasmission_id(uint8_t mailbox, uint32_t id) {
+    CAN1->sTxMailBox[mailbox].TIR &= ~CAN_TI0R_STID;
+    CAN1->sTxMailBox[mailbox].TIR |= (id << CAN_TI0R_STID_Pos);
+  }
+
+  void recieve(CAN_Rx_INRQ header, uint8_t (&str)[8]) {
     uint32_t recieved_data_hight = CAN1->sFIFOMailBox[0].RDHR;
     uint32_t recieved_data_low = CAN1->sFIFOMailBox[0].RDLR;
     uint8_t messages_amount = CAN1->RF0R << CAN_RF0R_FMP0_Pos;
@@ -203,22 +233,42 @@ public:
         data[i] = recieved_data_hight >> (i * header.data_length - 32);
       }
     }
+    for (uint8_t i = 0; i < header.data_length; i++) {
+      str[i] = data[i];
+    }
     CAN1->RF0R |= CAN_RF0R_RFOM0;
     messages_amount = CAN1->RF0R << CAN_RF0R_FMP0_Pos;
   }
 };
 
 extern "C" void USART1_IRQHandler(void) {
-  char rxd = USART1->DR;
-  // LED().led_toggle();
+  uint8_t rxd = USART1->DR;
+  uint8_t rx_str[sizeof(UART::buffer_fifo)] = "";
+  UART::buffer_fifo[sizeof(UART::buffer_fifo) % sizeof(UART::buffer_fifo) -
+                    UART::index - 1] = rxd;
+  if (UART::buffer_fifo[sizeof(UART::buffer_fifo) - 1] == '0' &&
+      UART::buffer_fifo[sizeof(UART::buffer_fifo) - 2] == '\\') {
+    for (uint8_t i = 0; i < sizeof(UART::buffer_fifo) / sizeof(uint8_t); i++) {
+      rx_str[i] = UART::buffer_fifo[i];
+      UART::buffer_fifo[i] = 0;
+    }
+  }
+  CAN_INRQ can_header;
+  can_header.can_tx.data_length = 8;
+  can_header.can_tx.tx_ID = 1;
+  CAN().change_trasmission_id(0, node_settings.transmit_node_id);
+  strrev(rx_str);
+  CAN().transmit(rx_str, sizeof(rx_str), can_header.can_tx);
+  LED().led_toggle();
 }
 
 CAN_INRQ inrq_config;
 extern "C" void CAN1_RX0_IRQHandler(void) {
+  uint8_t data[8] = "";
   LED().led_toggle();
-  CAN().recieve(inrq_config.can_rx);
+  CAN().recieve(inrq_config.can_rx, data);
+  UART().transmit(data, sizeof(data));
 }
-
 
 int main() {
   Delay().__init__(8);
@@ -258,7 +308,7 @@ int main() {
   inrq_config.can_bit_timing.silent_mode = 0;
 
   // transmit configuration
-  inrq_config.can_tx.tx_ID = 0;
+  inrq_config.can_tx.tx_ID = node_settings.transmit_node_id;
   inrq_config.can_tx.data_length = 8;
 
   // recieve configuration
@@ -266,7 +316,7 @@ int main() {
   inrq_config.can_rx.data_length = 8;
 
   // filter configuration
-  inrq_config.can_filter.filter_bank1 = 0;
+  inrq_config.can_filter.filter_bank1 = node_settings.self_node_id;
   inrq_config.can_filter.filter_bank2 = 0;
   inrq_config.can_filter.scale_32_enable = 1;
   inrq_config.can_filter.list_mode_enable = 1;
@@ -277,7 +327,7 @@ int main() {
 
   UART_INRQ UART_header;
 
-  UART_header.baudrate = 	3750;
+  UART_header.baudrate = 3750;
   UART_header.enable_transmitter = 1;
   UART_header.enable_reciever = 1;
   UART_header.enable_word_9bit = 0;
@@ -287,17 +337,18 @@ int main() {
   uart.__init__(UART_header);
 
   uint8_t temp = 0;
-  uint8_t data[] = "hunter x hunter";
+  uint8_t data[] = "some str";
 
   volatile uint16_t counter = 0;
 
   // 125	0.0000	18	16	13	2	87.5	 0x001c0011
 
+  // !todo in loop try to change id of transmission i bet it is not
   while (1) {
-    can.transmit(data, sizeof(data), inrq_config.can_tx);
-    Delay().wait(200);
-    uart.transmit(data, sizeof(data));
-    Delay().wait(500);
+    // can.transmit(data, sizeof(data), inrq_config.can_tx);
+    // Delay().wait(200);
+    // uart.transmit(data, sizeof(data));
+    // Delay().wait(500);
   }
 
   return 0;
