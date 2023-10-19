@@ -32,7 +32,7 @@ void Clock::configure_clock_source(Clock_INRQ header) {
 
     RCC->CR |= RCC_CR_PLLON;
 
-    if (Delay().timeout(RCC->CR, RCC_CR_PLLRDY, 255)) {
+    if (Delay().timeout(RCC->CR, RCC_CR_PLLRDY, 1055)) {
       this->reset_clock();
       LED().led_timeout_exception();
     }

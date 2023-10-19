@@ -14,13 +14,10 @@
 class CAN {
 private:
   void configure_gpio_rx() {
-    // GPIOA->CRH &= ~(GPIO_CRH_MODE11_Msk);
-    // GPIOA->CRH &= ~(GPIO_CRH_CNF11_Msk);
-    // GPIOA->CRH |= GPIO_CRH_CNF11_1;
-
-    GPIOA->CRH &= ~GPIO_CRH_CNF11;
+    GPIOA->CRH &= ~(GPIO_CRH_MODE11_Msk);
+    GPIOA->CRH &= ~(GPIO_CRH_CNF11_Msk);
     GPIOA->CRH |= GPIO_CRH_CNF11_1;
-    GPIOA->CRH |= GPIO_CRH_MODE11;
+    GPIOA->ODR |= GPIO_ODR_ODR11;
   }
 
   void configure_gpio_tx() {
@@ -245,7 +242,7 @@ int main() {
 
   Delay().__init__(36);
 
-  LED().led_off();
+  LED().led_on();
 
   SystemCoreClockUpdate();
   __IO uint32_t clock_value = SystemCoreClock;
@@ -255,7 +252,7 @@ int main() {
   inrq_config.can_bit_timing.time_segment_1 = 13;
   inrq_config.can_bit_timing.time_segment_2 = 2;
   inrq_config.can_bit_timing.SJW = 1;
-  inrq_config.can_bit_timing.loop_back = 1;
+  inrq_config.can_bit_timing.loop_back = 0;
   inrq_config.can_bit_timing.silent_mode = 0;
 
   // transmit configuration
@@ -295,8 +292,8 @@ int main() {
   // 125	0.0000	18	16	13	2	87.5	 0x001c0011
 
   while (1) {
-    // can.transmit(data, sizeof(data), inrq_config.can_tx);
-    // Delay().wait(200);
+    can.transmit(data, sizeof(data), inrq_config.can_tx);
+    Delay().wait(200);
     uart.transmit(data, sizeof(data));
     Delay().wait(500);
   }
