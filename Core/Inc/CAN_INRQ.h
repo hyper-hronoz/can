@@ -14,6 +14,8 @@ typedef struct {
   uint8_t scale_32_enable; // or else two 16bit banks
 
   uint8_t fifo1_enable; // or else fifo0
+
+  uint8_t activate_filter;
 } CAN_filter_INRQ;
 
 typedef struct {
@@ -32,7 +34,6 @@ typedef struct {
 
 typedef struct {
   uint16_t rx_ID;
-  uint8_t filter_id;
   uint8_t data_length;
   uint8_t remote_transmission_req;
   uint8_t extended_id;

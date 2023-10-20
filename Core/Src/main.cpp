@@ -16,12 +16,12 @@ CAN_INRQ can_header;
 
 Clock_INRQ clock_header;
 
-struct Node_settings {
-  uint8_t self_node_id = 1;
-  uint8_t transmit_node_id = 2;
+struct Node_can_settings {
+  uint8_t filter_id = 2 << 5;
+  uint8_t transmit_node_id = 1;
 };
 
-Node_settings node_settings;
+Node_can_settings node_settings;
 
 void strrev(uint8_t (&str)[8]) {
   // if the string is empty
@@ -97,10 +97,15 @@ private:
     CAN1->sFIFOMailBox[0].RIR &= ~(CAN_RI1R_IDE);
     CAN1->sFIFOMailBox[0].RIR |= (header.extended_id << CAN_RI1R_IDE_Pos);
 
+
     // remove transmission request
     CAN1->sFIFOMailBox[0].RIR &= ~(CAN_RI1R_RTR_Msk); // data frame
     CAN1->sFIFOMailBox[0].RIR |=
         (header.remote_transmission_req << CAN_RI1R_RTR_Pos); // data frame
+                                                              //
+    // extended id
+    CAN1->sFIFOMailBox[0].RIR |=
+        (header.extended_id << CAN_RI1R_IDE_Pos);
 
     // configuring filter for mailbox ex: 0 - index of filter
     CAN1->sFIFOMailBox[0].RDTR &= ~(CAN_RDT0R_FMI_Msk);
@@ -124,16 +129,16 @@ private:
     CAN1->FS1R &= ~(CAN_FS1R_FSC0);
     CAN1->FS1R |= (header.scale_32_enable << header.filter_position);
 
-    CAN1->sFilterRegister[0].FR1 = header.filter_bank1;
-    CAN1->sFilterRegister[0].FR2 = header.filter_bank2;
+    CAN1->sFilterRegister[header.filter_position].FR1 = header.filter_bank1;
+    CAN1->sFilterRegister[header.filter_position].FR2 = header.filter_bank2;
 
-    CAN1->FFA1R &= ~(1 << header.filter_position);
+    CAN1->FFA1R &= ~(0b1 << header.filter_position);
     CAN1->FFA1R |= (header.fifo1_enable << header.filter_position);
 
-    CAN1->FMR &= ~(CAN_FMR_FINIT);
-
     // activate filter
-    CAN1->FA1R |= (1 << header.filter_position);
+    CAN1->FA1R |= (header.activate_filter << header.filter_position);
+
+    CAN1->FMR &= ~(CAN_FMR_FINIT);
   }
 
   void configure_interrupts() {
@@ -254,7 +259,7 @@ extern "C" void USART1_IRQHandler(void) {
   UART::index++;
   
   UART().transmit(rx_data, sizeof(rx_data));
-
+  const char *info = (const char *)UART::buffer_fifo;
   if (strstr((const char *)UART::buffer_fifo, "\\0") != NULL) {
     for (uint8_t i = 0; i < sizeof(UART::buffer_fifo) / sizeof(uint8_t); i++) {
       rx_str[i] = UART::buffer_fifo[i];
@@ -262,16 +267,19 @@ extern "C" void USART1_IRQHandler(void) {
     }
     CAN().change_trasmission_id(0, node_settings.transmit_node_id);
     strrev(rx_str);
+    CAN_Tx_INRQ info = can_header.can_tx; 
     CAN().transmit(rx_str, sizeof(rx_str), can_header.can_tx);
-    LED().led_toggle();
+    // LED().led_toggle();
   }
+  return;
 }
 
 extern "C" void CAN1_RX0_IRQHandler(void) {
   uint8_t data[8] = "";
   LED().led_toggle();
   CAN().recieve(can_header.can_rx, data);
-  // UART().transmit(data, sizeof(data));
+  CAN().transmit(data, sizeof(data), can_header.can_tx);
+  UART().transmit(data, sizeof(data));
 }
 
 int main() {
@@ -317,13 +325,17 @@ int main() {
   // recieve configuration
   can_header.can_rx.rx_ID = 0;
   can_header.can_rx.data_length = 8;
+  can_header.can_rx.extended_id = 0;
+  can_header.can_rx.remote_transmission_req = 0;
 
   // filter configuration
-  can_header.can_filter.filter_bank1 = node_settings.self_node_id;
-  can_header.can_filter.filter_bank2 = 0;
-  can_header.can_filter.scale_32_enable = 1;
-  can_header.can_filter.list_mode_enable = 1;
+  can_header.can_filter.fifo1_enable = 0;
   can_header.can_filter.filter_position = 0;
+  can_header.can_filter.filter_bank1 = node_settings.filter_id;
+  can_header.can_filter.filter_bank2 = node_settings.filter_id;
+  can_header.can_filter.scale_32_enable = 0;
+  can_header.can_filter.list_mode_enable = 1;
+  can_header.can_filter.activate_filter = 1;
 
   CAN can;
   can.__init__(can_header);
@@ -347,10 +359,10 @@ int main() {
 
   // !todo in loop try to change id of transmission i bet it is not
   while (1) {
-    // can.transmit(data, sizeof(data), inrq_config.can_tx);
+    // can.transmit(data, sizeof(data), can_header.can_tx);
     // Delay().wait(200);
-    uart.transmit(uart_pending, sizeof(uart_pending));
-    Delay().wait(500);
+    // uart.transmit(uart_pending, sizeof(uart_pending));
+    // Delay().wait(500);
   }
 
   return 0;
