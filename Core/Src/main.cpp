@@ -11,15 +11,28 @@
 #include <time.h>
 #include <cstring>
 
+// !should be done by cmake
+// #define __FIRST_DEVICE__
+#define __SECOND_DEVICE__
+
 UART_INRQ UART_header;
 CAN_INRQ can_header;
 
 Clock_INRQ clock_header;
 
+#ifdef __FIRST_DEVICE__
+struct Node_can_settings {
+  uint8_t filter_id = 1 << 5;
+  uint8_t transmit_node_id = 2;
+};
+#endif
+
+#ifdef __SECOND_DEVICE__
 struct Node_can_settings {
   uint8_t filter_id = 2 << 5;
   uint8_t transmit_node_id = 1;
 };
+#endif
 
 Node_can_settings node_settings;
 
@@ -260,13 +273,12 @@ extern "C" void USART1_IRQHandler(void) {
   
   UART().transmit(rx_data, sizeof(rx_data));
   const char *info = (const char *)UART::buffer_fifo;
-  if (strstr((const char *)UART::buffer_fifo, "\\0") != NULL) {
+  if (strstr((const char *)UART::buffer_fifo, "\r") != NULL) {
     for (uint8_t i = 0; i < sizeof(UART::buffer_fifo) / sizeof(uint8_t); i++) {
       rx_str[i] = UART::buffer_fifo[i];
       UART::buffer_fifo[i] = 0;
     }
     CAN().change_trasmission_id(0, node_settings.transmit_node_id);
-    strrev(rx_str);
     CAN_Tx_INRQ info = can_header.can_tx; 
     CAN().transmit(rx_str, sizeof(rx_str), can_header.can_tx);
     // LED().led_toggle();
@@ -276,8 +288,13 @@ extern "C" void USART1_IRQHandler(void) {
 
 extern "C" void CAN1_RX0_IRQHandler(void) {
   uint8_t data[8] = "";
+  uint8_t delimiter[8] = "";
   LED().led_toggle();
   CAN().recieve(can_header.can_rx, data);
+#ifdef __SECOND_DEVICE__
+  strrev(data);
+#endif
+  // CAN().transmit(delimiter, sizeof(delimiter), can_header.can_tx);
   CAN().transmit(data, sizeof(data), can_header.can_tx);
   UART().transmit(data, sizeof(data));
 }
