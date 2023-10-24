@@ -6,14 +6,14 @@
 #include "UART.h"
 #include "stm32f103xb.h"
 #include "stm32f1xx.h"
+#include <cstring>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <cstring>
 
 // !should be done by cmake
-// #define __FIRST_DEVICE__
-#define __SECOND_DEVICE__
+#define __FIRST_DEVICE__
+// #define __SECOND_DEVICE__
 
 UART_INRQ UART_header;
 CAN_INRQ can_header;
@@ -110,15 +110,13 @@ private:
     CAN1->sFIFOMailBox[0].RIR &= ~(CAN_RI1R_IDE);
     CAN1->sFIFOMailBox[0].RIR |= (header.extended_id << CAN_RI1R_IDE_Pos);
 
-
     // remove transmission request
     CAN1->sFIFOMailBox[0].RIR &= ~(CAN_RI1R_RTR_Msk); // data frame
     CAN1->sFIFOMailBox[0].RIR |=
         (header.remote_transmission_req << CAN_RI1R_RTR_Pos); // data frame
                                                               //
     // extended id
-    CAN1->sFIFOMailBox[0].RIR |=
-        (header.extended_id << CAN_RI1R_IDE_Pos);
+    CAN1->sFIFOMailBox[0].RIR |= (header.extended_id << CAN_RI1R_IDE_Pos);
 
     // configuring filter for mailbox ex: 0 - index of filter
     CAN1->sFIFOMailBox[0].RDTR &= ~(CAN_RDT0R_FMI_Msk);
@@ -264,39 +262,45 @@ public:
 };
 
 extern "C" void USART1_IRQHandler(void) {
-  uint8_t rxd = USART1->DR;
-  uint8_t rx_data[1];
-  rx_data[0] = rxd;
-  uint8_t rx_str[sizeof(UART::buffer_fifo)] = "";
-  UART::buffer_fifo[UART::index % sizeof(UART::buffer_fifo)] = rxd;
-  UART::index++;
-  
-  UART().transmit(rx_data, sizeof(rx_data));
-  const char *info = (const char *)UART::buffer_fifo;
-  if (strstr((const char *)UART::buffer_fifo, "\r") != NULL) {
-    for (uint8_t i = 0; i < sizeof(UART::buffer_fifo) / sizeof(uint8_t); i++) {
-      rx_str[i] = UART::buffer_fifo[i];
-      UART::buffer_fifo[i] = 0;
+#ifdef __FIRST_DEVICE__
+  if (USART1->SR & USART_SR_RXNE) {
+    if (UART::index == 8) {
+      CAN().transmit(UART::buffer, sizeof(UART::buffer), can_header.can_tx);
+      UART().clear_buffer();
     }
-    CAN().change_trasmission_id(0, node_settings.transmit_node_id);
-    CAN_Tx_INRQ info = can_header.can_tx; 
-    CAN().transmit(rx_str, sizeof(rx_str), can_header.can_tx);
-    // LED().led_toggle();
+
+    uint8_t rxd = USART1->DR;
+
+    UART::buffer[UART::index] = rxd;
+
+    uint8_t info1 = UART::index;
+    uint8_t info2 = sizeof(UART::buffer) - 1;
+
+    UART::index++;
   }
+
+  if ((USART1->SR & USART_SR_IDLE)) {
+    uint8_t rxd = USART1->DR;
+    CAN().transmit(UART::buffer, sizeof(UART::buffer), can_header.can_tx);
+
+    UART().clear_buffer();
+  }
+#endif
   return;
 }
 
 extern "C" void CAN1_RX0_IRQHandler(void) {
   uint8_t data[8] = "";
-  uint8_t delimiter[8] = "";
+  // uint8_t delimiter[8] = "";
   LED().led_toggle();
   CAN().recieve(can_header.can_rx, data);
+#ifdef __FIRST_DEVICE__
+  UART().transmit(data, sizeof(data));
+#endif
 #ifdef __SECOND_DEVICE__
   strrev(data);
-#endif
-  // CAN().transmit(delimiter, sizeof(delimiter), can_header.can_tx);
   CAN().transmit(data, sizeof(data), can_header.can_tx);
-  UART().transmit(data, sizeof(data));
+#endif
 }
 
 int main() {

@@ -8,7 +8,7 @@
 class UART {
   public:
     static uint8_t index;
-    static uint8_t buffer_fifo[8];
+    static uint8_t buffer[8];
   private:
     void configure_GPIO_recieve();
 
@@ -22,6 +22,8 @@ class UART {
     void recieve();
 
     void transmit(uint8_t *data, uint32_t size);
+
+    void clear_buffer();
 };
 
 #endif
