@@ -21,6 +21,7 @@ enum Clock_system_source_selector {
 typedef struct {
   uint8_t APB1_prescaler;
   uint8_t APB2_prescaler;
+  uint8_t AHB_prescaler;
 
   uint8_t PLL_prescaler;
   uint8_t PLL_multiplier;
