@@ -21,7 +21,7 @@ CAN_INRQ can_header;
 
 Clock_INRQ clock_header;
 
-#ifdef __DEBUG__ 
+#ifdef __DEBUG__
 struct Node_can_settings {
   uint8_t filter_id = 0 << 5;
   uint8_t transmit_node_id = 0;
@@ -270,14 +270,14 @@ public:
 };
 
 static uint32_t uart_frames_counter = 0;
-static uint32_t buffer_size = (100 * sizeof(uint8_t));
-static uint8_t *buffer = (uint8_t*)malloc(buffer_size);
+static uint32_t buffer_size = (8 * sizeof(uint8_t));
+static uint8_t *buffer = (uint8_t *)malloc(buffer_size);
 extern "C" void USART1_IRQHandler(void) {
 #ifdef __FIRST_DEVICE__
   if (USART1->SR & USART_SR_RXNE) {
     uint8_t info = sizeof(buffer);
     if (uart_frames_counter == buffer_size / sizeof(uint8_t)) {
-      uint8_t *buffer_copy = (uint8_t*)malloc(buffer_size * 2);
+      uint8_t *buffer_copy = (uint8_t *)malloc(buffer_size * 2);
 
       for (uint32_t i = 0; i < 2 * buffer_size / sizeof(uint8_t); i++) {
         buffer_copy[i] = 0;
@@ -300,16 +300,14 @@ extern "C" void USART1_IRQHandler(void) {
   }
 
   if ((USART1->SR & USART_SR_IDLE)) {
-    Delay().wait(1000);
     uint8_t rxd = USART1->DR;
-    CAN().transmit(buffer, 100, can_header.can_tx);
+    CAN().transmit(buffer, buffer_size / sizeof(uint8_t), can_header.can_tx);
 
-    uart_frames_counter=0;
+    uart_frames_counter = 0;
 
     for (uint32_t i = 0; i < buffer_size / sizeof(uint8_t); i++) {
       buffer[i] = 0;
     }
-
 
     // UART().clear_buffer();
   }
@@ -317,22 +315,21 @@ extern "C" void USART1_IRQHandler(void) {
   return;
 }
 
-
 uint8_t counter = 0;
-static uint8_t *can_buffer = (uint8_t*)malloc(sizeof(uint8_t) * 100);
+static uint8_t *can_buffer = (uint8_t *)malloc(sizeof(uint8_t) * 100);
 static uint32_t can_counter = 0;
 extern "C" void CAN1_RX0_IRQHandler(void) {
   uint8_t data[8] = "";
-  // uint8_t delimiter[8] = "";
   LED().led_toggle();
   CAN().recieve(can_header.can_rx, data);
   for (uint8_t i = 0; i < sizeof(data); i++) {
-    can_buffer[can_counter % 100]= data[i];
+    can_buffer[can_counter % 100] = data[i];
     can_counter++;
   }
 #ifdef __FIRST_DEVICE__
-  // Delay().wait(1000);
-  UART().transmit(data, sizeof(data));
+  if (can_counter == 40) {
+    UART().transmit(data, sizeof(data));
+  }
 #endif
 #ifdef __SECOND_DEVICE__
   CAN().transmit(data, sizeof(data), can_header.can_tx);
@@ -417,12 +414,14 @@ int main() {
   uart.__init__(UART_header);
 
   uint8_t temp = 0;
-  uint8_t uart_pending[] = ".";
+  uint8_t uart_pending[] = "";
 
   volatile uint16_t counter = 0;
 
   // 125	0.0000	18	16	13	2	87.5	 0x001c0011
 
+  uint8_t test[] = "hello how low i am speaking it should work";
+  CAN().transmit(test, sizeof(test), can_header.can_tx);
   // !todo in loop try to change id of transmission i bet it is not
   while (1) {
     // UART().transmit(data, sizeof(data));
