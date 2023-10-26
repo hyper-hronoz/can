@@ -12,9 +12,11 @@
 #include <time.h>
 
 // !should be done by cmake
-#define __DEBUG__
+// #define __DEBUG__
 #define __FIRST_DEVICE__
 // #define __SECOND_DEVICE__
+
+#define CAN_buffer_size 128
 
 UART_INRQ UART_header;
 CAN_INRQ can_header;
@@ -64,6 +66,10 @@ void strrev(uint8_t (&str)[8]) {
 }
 
 class CAN {
+public:
+  static uint8_t buffer[CAN_buffer_size];
+  static uint8_t index;
+
 private:
   void configure_gpio_rx() {
     GPIOA->CRH &= ~(GPIO_CRH_MODE11_Msk);
@@ -161,11 +167,9 @@ private:
   }
 
   void configure_interrupts() {
-    CAN1->IER |= CAN_IER_FMPIE0;
     CAN1->IER |= CAN_IER_FFIE0;
 
     NVIC_EnableIRQ(CAN1_RX0_IRQn);
-    NVIC_EnableIRQ(CAN1_TX_IRQn);
   }
 
   void can_INRQ(CAN_INRQ header) {
@@ -269,77 +273,39 @@ public:
   }
 };
 
-static uint32_t uart_frames_counter = 0;
-static uint32_t buffer_size = (8 * sizeof(uint8_t));
-static uint8_t *buffer = (uint8_t *)malloc(buffer_size);
+uint8_t CAN::buffer[CAN_buffer_size] = "";
+uint8_t CAN::index = 0;
+
 extern "C" void USART1_IRQHandler(void) {
+  __disable_irq();
 #ifdef __FIRST_DEVICE__
   if (USART1->SR & USART_SR_RXNE) {
-    uint8_t info = sizeof(buffer);
-    if (uart_frames_counter == buffer_size / sizeof(uint8_t)) {
-      uint8_t *buffer_copy = (uint8_t *)malloc(buffer_size * 2);
-
-      for (uint32_t i = 0; i < 2 * buffer_size / sizeof(uint8_t); i++) {
-        buffer_copy[i] = 0;
-      }
-
-      for (uint32_t i = 0; i < buffer_size / sizeof(uint8_t); i++) {
-        buffer_copy[i] = buffer[i];
-      }
-      buffer_size *= 2;
-      free(buffer);
-      buffer = nullptr;
-      buffer = buffer_copy;
-    }
-
     uint8_t rxd = USART1->DR;
-
-    buffer[uart_frames_counter] = rxd;
-    uart_frames_counter++;
-    // UART::index++;
+    UART::buffer[UART::index] = rxd;
+    UART::index++;
   }
 
-  if ((USART1->SR & USART_SR_IDLE)) {
-    uint8_t rxd = USART1->DR;
-    CAN().transmit(buffer, buffer_size / sizeof(uint8_t), can_header.can_tx);
-
-    uart_frames_counter = 0;
-
-    for (uint32_t i = 0; i < buffer_size / sizeof(uint8_t); i++) {
-      buffer[i] = 0;
-    }
-
-    // UART().clear_buffer();
-  }
 #endif
-  return;
+  __enable_irq();
 }
 
-uint8_t counter = 0;
-static uint8_t *can_buffer = (uint8_t *)malloc(sizeof(uint8_t) * 100);
-static uint32_t can_counter = 0;
-extern "C" void CAN1_RX0_IRQHandler(void) {
+void on_can_recieve() {
   uint8_t data[8] = "";
   LED().led_toggle();
   CAN().recieve(can_header.can_rx, data);
   for (uint8_t i = 0; i < sizeof(data); i++) {
-    can_buffer[can_counter % 100] = data[i];
-    can_counter++;
+    CAN::buffer[CAN::index] = data[i];
+    CAN::index++;
   }
-#ifdef __FIRST_DEVICE__
-  if (can_counter == 40) {
-    UART().transmit(data, sizeof(data));
-  }
-#endif
-#ifdef __SECOND_DEVICE__
-  CAN().transmit(data, sizeof(data), can_header.can_tx);
-#endif
+}
+
+extern "C" void CAN1_RX0_IRQHandler(void) {
+  __disable_irq();
+  on_can_recieve();
+  __enable_irq();
 }
 
 int main() {
-  for (uint32_t i = 0; i < 100; i++) {
-    can_buffer[i] = 0;
-  }
   Delay().__init__(8);
   LED().__init__();
 
@@ -420,15 +386,74 @@ int main() {
 
   // 125	0.0000	18	16	13	2	87.5	 0x001c0011
 
-  uint8_t test[] = "hello how low i am speaking it should work";
-  CAN().transmit(test, sizeof(test), can_header.can_tx);
-  // !todo in loop try to change id of transmission i bet it is not
   while (1) {
-    // UART().transmit(data, sizeof(data));
-    // can.transmit(data, sizeof(data), can_header.can_tx);
-    // Delay().wait(200);
-    // uart.transmit(uart_pending, sizeof(uart_pending));
-    // Delay().wait(500);
+#ifdef __FIRST_DEVICE__
+    if ((USART1->SR & USART_SR_IDLE)) {
+      // USART1->CR1 |= USART_CR1_RE;
+      uint8_t rxd = USART1->DR;
+      uint8_t uart_buffer_copy[UART_buffer_size] = "";
+
+      for (uint8_t i = 0; i < sizeof(UART::buffer); i++) {
+        uart_buffer_copy[i] = UART::buffer[i];
+      }
+
+      for (uint8_t i = 0; i < sizeof(UART::buffer); i++) {
+        UART::buffer[i] = 0;
+      }
+
+      for (uint8_t i = 0; i < sizeof(CAN::buffer); i++) {
+        CAN::buffer[i] = 0;
+      }
+
+      CAN::index = 0;
+      UART::index = 0;
+
+      CAN().transmit(uart_buffer_copy, sizeof(uart_buffer_copy),
+                     can_header.can_tx);
+    }
+#endif
+    for (uint8_t j = 0; j < sizeof(CAN::buffer); j++) {
+      if (CAN::buffer[j] == '\n') {
+        uint8_t can_buffer_copy[CAN_buffer_size] = "";
+
+        for (uint8_t i = 0; i < sizeof(CAN::buffer); i++) {
+          can_buffer_copy[i] = CAN::buffer[i];
+        }
+
+        for (uint8_t i = 0; i < sizeof(CAN::buffer); i++) {
+          CAN::buffer[i] = 0;
+        }
+
+        for (uint8_t i = 0; i < sizeof(UART::buffer); i++) {
+          UART::buffer[i] = 0;
+        }
+
+        CAN::index = 0;
+        UART::index = 0;
+#ifdef __FIRST_DEVICE__
+        uint8_t to_send[UART_buffer_size] = "";
+        uint8_t to_send_index = 0;
+        for (uint8_t i = 0; i < UART_buffer_size; i++) {
+          if (can_buffer_copy[i] != 0) {
+            to_send[to_send_index] = can_buffer_copy[i];
+            to_send_index++;
+          }
+        }
+        UART().transmit(to_send, sizeof(to_send));
+        CAN::index = 0;
+        UART::index = 0;
+#endif
+#ifdef __SECOND_DEVICE__
+        can_buffer_copy[0] = 'A';
+
+        CAN().transmit(can_buffer_copy, sizeof(can_buffer_copy),
+                       can_header.can_tx);
+
+        CAN::index = 0;
+        UART::index = 0;
+#endif
+      }
+    }
   }
 
   return 0;

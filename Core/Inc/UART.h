@@ -5,10 +5,12 @@
 #include "UART_INRQ.h"
 #include "Delay.h"
 
+#define UART_buffer_size 128
+
 class UART {
   public:
     static uint8_t index;
-    static uint8_t buffer[8];
+    static uint8_t buffer[UART_buffer_size];
   private:
     void configure_GPIO_recieve();
 

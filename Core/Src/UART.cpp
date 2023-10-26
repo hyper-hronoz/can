@@ -2,7 +2,7 @@
 #include "Delay.h"
 #include "LED.h"
 
-uint8_t UART::buffer[8] = "";
+uint8_t UART::buffer[UART_buffer_size] = "";
 uint8_t UART::index = 0;
 
 void UART::configure_GPIO_recieve() {
@@ -53,7 +53,7 @@ void UART::configure_UART(UART_INRQ header) {
   USART1->CR1 |= (header.enable_reciever << USART_CR1_RE_Pos);
 
   USART1->CR1 |= USART_CR1_RXNEIE;
-  USART1->CR1 |= USART_CR1_IDLEIE;
+  // USART1->CR1 |= USART_CR1_IDLEIE;
   NVIC_EnableIRQ (USART1_IRQn);
 }
 
